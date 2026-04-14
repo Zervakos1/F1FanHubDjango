@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upgrade to Premium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/upgrade_premium.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="upgrade-page">
+    <article class="upgrade-card content-card">
+        <h1 class="page-title">Upgrade to Premium</h1>
+        <p class="page-subtitle">
+            Unlock premium-only items and exclusive F1 fan experiences.
+        </p>
+
+        <div class="upgrade-features">
+            <p>Price: <strong>$15.00</strong></p>
+            <p>Access premium-only products</p>
+            <p>Access premium experiences and exclusive items</p>
+            <p>This upgrade is simulated for the project and does not process real payments.</p>
+        </div>
+
+        <form method="post" class="upgrade-form">
+            {% csrf_token %}
+            <button type="submit">Activate Premium for $15</button>
+        </form>
+    </article>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/upgrade_premium.js' %}"></script>
+{% endblock %}

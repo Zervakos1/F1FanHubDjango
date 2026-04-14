@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-grid">
+    <section class="content-card dashboard-intro">
+        <h1 class="page-title">Admin Dashboard</h1>
+        <p class="page-subtitle">
+            Monitor the platform, review totals, and open the Django admin panel for full management.
+        </p>
+
+        <div class="dashboard-actions">
+            <a href="/admin/" class="button">Open Django Admin</a>
+            <a href="/catalog/" class="button">View Catalogue</a>
+        </div>
+    </section>
+
+    <section class="content-card">
+        <h2>Platform Overview</h2>
+
+        <div class="summary-grid">
+            <article class="summary-box">
+                <p class="summary-label">Users</p>
+                <p class="summary-value">{{ total_users }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Premium Users</p>
+                <p class="summary-value">{{ premium_users }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Products</p>
+                <p class="summary-value">{{ total_products }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Premium Products</p>
+                <p class="summary-value">{{ premium_products }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Orders</p>
+                <p class="summary-value">{{ total_orders }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Reviews</p>
+                <p class="summary-value">{{ total_reviews }}</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="content-card">
+        <h2>Latest Orders</h2>
+
+        {% if latest_orders %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>User</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in latest_orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td>{{ order.user.username }}</td>
+                                <td>{{ order.status }}</td>
+                                <td>€{{ order.total_amount }}</td>
+                                <td>{{ order.created_at }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No orders available yet.</p>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard/admin_dashboard.js' %}"></script>
+{% endblock %}

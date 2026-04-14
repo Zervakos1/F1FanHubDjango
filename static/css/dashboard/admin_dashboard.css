@@ -1,0 +1,54 @@
+/* admin_dashboard.css
+   Styles the admin dashboard.
+   Includes summary cards, dashboard intro, action buttons, and responsive admin overview layout.
+*/
+
+.dashboard-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.dashboard-intro {
+    display: grid;
+    gap: 16px;
+}
+
+.dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.summary-box {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.summary-label,
+.summary-value {
+    margin: 0;
+}
+
+.summary-label {
+    color: var(--text-soft);
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}

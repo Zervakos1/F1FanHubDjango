@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Catalogue{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalog/product_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="catalogue-page stack">
+    <section class="catalogue-hero content-card">
+        <h1 class="page-title">F1 Fan Hub Catalogue</h1>
+        <p class="page-subtitle">
+            Browse Formula 1 products, use filters, and open each item for more details.
+        </p>
+    </section>
+
+    <section class="catalogue-layout">
+        <aside class="filters-panel content-card">
+            <h2>Search and Filters</h2>
+
+            <form method="get" class="filters-form">
+                <div class="field-group">
+                    <label for="q">Search by name</label>
+                    <input type="text" id="q" name="q" value="{{ request.GET.q }}" placeholder="e.g. Ferrari cap">
+                </div>
+
+                <div class="field-group">
+                    <label for="brand">Brand / Team</label>
+                    <input type="text" id="brand" name="brand" value="{{ request.GET.brand }}" placeholder="e.g. Ferrari">
+                </div>
+
+                <div class="field-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" name="color" value="{{ request.GET.color }}" placeholder="e.g. red">
+                </div>
+
+                <div class="field-group">
+                    <label for="size">Size</label>
+                    <input type="text" id="size" name="size" value="{{ request.GET.size }}" placeholder="e.g. M">
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label for="min_price">Min price</label>
+                        <input type="number" step="0.01" id="min_price" name="min_price" value="{{ request.GET.min_price }}">
+                    </div>
+
+                    <div class="field-group">
+                        <label for="max_price">Max price</label>
+                        <input type="number" step="0.01" id="max_price" name="max_price" value="{{ request.GET.max_price }}">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category">
+                        <option value="">All categories</option>
+
+                        {% for parent in parent_categories %}
+                            <option value="{{ parent.slug }}" {% if request.GET.category == parent.slug %}selected{% endif %}>
+                                {{ parent.name }}
+                            </option>
+
+                            {% for child in parent.subcategories.all %}
+                                <option value="{{ child.slug }}" {% if request.GET.category == child.slug %}selected{% endif %}>
+                                    -- {{ child.name }}
+                                </option>
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit">Apply Filters</button>
+                    <a href="/catalog/" class="button secondary-button">Clear</a>
+                </div>
+            </form>
+        </aside>
+
+        <section class="catalogue-results">
+            <div class="results-header content-card">
+                <h2>Products</h2>
+                <p>{{ products|length }} item{{ products|length|pluralize }} found</p>
+            </div>
+
+            {% if products %}
+                <div class="product-grid">
+                    {% for product in products %}
+                        <article class="product-card content-card">
+                            <div class="product-image-wrap">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                                    {% elif product.external_image_url %}
+                                        <img src="{{ product.external_image_url }}" alt="{{ product.name }}" class="product-image">
+                                    {% else %}
+                                        <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-image">
+                                    {% endif %}
+                                </div>
+                            <div class="product-card-top">
+                                <div>
+                                    <p class="product-category">
+                                        {% if product.category.parent %}
+                                            {{ product.category.parent.name }} / {{ product.category.name }}
+                                        {% else %}
+                                            {{ product.category.name }}
+                                        {% endif %}
+                                    </p>
+                                    <h3 class="product-name">{{ product.name }}</h3>
+                                </div>
+
+                                {% if product.is_premium_only %}
+                                    <span class="product-badge">Premium</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="product-meta">
+                                <p><strong>Brand:</strong> {{ product.brand|default:"-" }}</p>
+                                <p><strong>Color:</strong> {{ product.color|default:"-" }}</p>
+                                <p><strong>Size:</strong> {{ product.size|default:"-" }}</p>
+                            </div>
+
+                            <p class="product-description">{{ product.description|truncatewords:18 }}</p>
+
+                            <div class="product-card-bottom">
+                                <div>
+                                    <p class="product-price">€{{ product.price }}</p>
+                                    <p class="product-stock">
+                                        {% if product.stock > 0 %}
+                                            In stock: {{ product.stock }}
+                                        {% else %}
+                                            Out of stock
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <a href="/catalog/{{ product.slug }}/" class="button">View Details</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state content-card">
+                    <h3>No products found</h3>
+                    <p>Try changing the search text or clearing the filters.</p>
+                    <a href="/catalog/" class="button">Reset Catalogue</a>
+                </div>
+            {% endif %}
+        </section>
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/catalog/product_list.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cancel Premium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/cancel_premium.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="cancel-page">
+    <article class="cancel-card content-card">
+        <h1 class="page-title">Cancel Premium Membership</h1>
+        <p class="page-subtitle">
+            If you cancel, your account will return to a normal user account.
+        </p>
+
+        <p>You will lose access to premium-only products and premium dashboard features.</p>
+
+        <form method="post" class="cancel-form">
+            {% csrf_token %}
+            <button type="submit">Confirm Cancellation</button>
+        </form>
+
+        <a href="/my-dashboard/" class="button secondary-button">Go Back</a>
+    </article>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/cancel_premium.js' %}"></script>
+{% endblock %}

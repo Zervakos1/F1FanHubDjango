@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order History{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cart/order_history.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="orders-page stack">
+    <section class="content-card">
+        <h1 class="page-title">Order History</h1>
+        <p class="page-subtitle">
+            Review your simulated purchases and previously confirmed orders.
+        </p>
+    </section>
+
+    {% if orders %}
+        <div class="orders-list stack">
+            {% for order in orders %}
+                <article class="order-card content-card">
+                    <div class="order-header">
+                        {% if order.discount_applied > 0 %}
+                            <p class="order-meta">
+                                Reward Used: {{ order.reward_name }} | Discount: €{{ order.discount_applied }}
+                            </p>
+                        {% endif %}
+                        <div>
+                            <h2>Order #{{ order.id }}</h2>
+                            <p class="order-meta">
+                                Date: {{ order.created_at }} | Status: {{ order.status }}
+                            </p>
+                        </div>
+
+                        <p class="order-total">€{{ order.total_amount }}</p>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                    <tr>
+                                        <td>{{ item.product.name }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>€{{ item.price_at_purchase }}</td>
+                                        <td>€{{ item.subtotal }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <section class="content-card">
+            <h2>No orders yet</h2>
+            <p>You have not completed a simulated purchase yet.</p>
+            <a href="/catalog/" class="button">Browse Catalogue</a>
+        </section>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart/order_history.js' %}"></script>
+{% endblock %}

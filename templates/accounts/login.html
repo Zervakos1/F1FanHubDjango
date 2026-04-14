@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/login.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-card content-card">
+        <h1>Login</h1>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="auth-button">Login</button>
+        </form>
+
+        <div class="auth-links">
+            <a href="/accounts/register/">Create an account</a>
+        </div>
+
+        <div class="demo-users">
+            <h3>Demo Accounts</h3>
+            <ul>
+                <li>Regular: regularuser / Regular123!</li>
+                <li>Premium: premiumuser / Premium123!</li>
+                <li>Admin: adminuser / Admin123!</li>
+                <li>Test: testuser / Test123!</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/login.js' %}"></script>
+{% endblock %}

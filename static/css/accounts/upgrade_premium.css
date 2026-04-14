@@ -1,0 +1,30 @@
+/* upgrade_premium.css
+   Styles the premium upgrade page.
+   Includes the premium feature list and the upgrade confirmation form.
+*/
+
+.upgrade-page {
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+}
+
+.upgrade-card {
+    width: 100%;
+    max-width: 700px;
+    display: grid;
+    gap: 18px;
+}
+
+.upgrade-features {
+    display: grid;
+    gap: 10px;
+}
+
+.upgrade-features p {
+    margin: 0;
+}
+
+.upgrade-form {
+    display: grid;
+}

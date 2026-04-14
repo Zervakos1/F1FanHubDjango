@@ -1,0 +1,65 @@
+.profile-page {
+    gap: 20px;
+}
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.profile-summary,
+.profile-form-card {
+    display: grid;
+    gap: 16px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.summary-box {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.summary-label,
+.summary-value {
+    margin: 0;
+}
+
+.summary-label {
+    color: var(--text-soft);
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.profile-form {
+    display: grid;
+    gap: 16px;
+}
+
+.field-group {
+    display: grid;
+    gap: 8px;
+}
+
+@media (max-width: 950px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}

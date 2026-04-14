@@ -1,0 +1,36 @@
+.orders-page {
+    gap: 20px;
+}
+
+.orders-list {
+    gap: 20px;
+}
+
+.order-card {
+    display: grid;
+    gap: 18px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.order-header h2,
+.order-meta,
+.order-total {
+    margin: 0;
+}
+
+.order-meta {
+    color: var(--text-soft);
+    margin-top: 8px;
+}
+
+.order-total {
+    font-size: 1.2rem;
+    font-weight: 700;
+}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Wishlist{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalog/wishlist.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="wishlist-page stack">
+    <section class="content-card">
+        <h1 class="page-title">My Wishlist</h1>
+        <p class="page-subtitle">Save products you may want to buy later.</p>
+    </section>
+
+    {% if wishlist_products %}
+        <div class="wishlist-grid">
+            {% for product in wishlist_products %}
+                <article class="wishlist-card content-card">
+                    <div class="wishlist-image-wrap">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="wishlist-image">
+                        {% elif product.external_image_url %}
+                            <img src="{{ product.external_image_url }}" alt="{{ product.name }}" class="wishlist-image">
+                        {% else %}
+                            <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="wishlist-image">
+                        {% endif %}
+                    </div>
+
+                    <p class="wishlist-category">
+                        {% if product.category.parent %}
+                            {{ product.category.parent.name }} / {{ product.category.name }}
+                        {% else %}
+                            {{ product.category.name }}
+                        {% endif %}
+                    </p>
+
+                    <h3>{{ product.name }}</h3>
+                    <p>€{{ product.price }}</p>
+
+                    <div class="wishlist-actions">
+                        <a href="/catalog/{{ product.slug }}/" class="button">View</a>
+                        <a href="/catalog/wishlist/remove/{{ product.id }}/" class="button secondary-button">Remove</a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <section class="content-card">
+            <h2>Your wishlist is empty</h2>
+            <p>Save products from the catalogue to view them here later.</p>
+            <a href="/catalog/" class="button">Browse Catalogue</a>
+        </section>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/catalog/wishlist.js' %}"></script>
+{% endblock %}

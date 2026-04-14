@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/faq/faq.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="faq-page stack">
+    <section class="content-card">
+        <h1 class="page-title">Frequently Asked Questions</h1>
+        <p class="page-subtitle">
+            Find answers about F1 Fan Hub, accounts, premium access, orders, reviews, and the project functionality.
+        </p>
+    </section>
+
+    <section class="content-card faq-list" data-faq-list>
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                What is F1 Fan Hub?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    F1 Fan Hub is a Django web application for Formula 1 fans. It includes a product catalogue,
+                    role-based dashboards, simulated shopping cart, premium access, and AJAX reviews.
+                </p>
+            </div>
+        </article>
+
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                Do I need an account to browse products?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    No. Visitors can browse the catalogue and open product details. An account is only required
+                    for reviews, cart actions, orders, and dashboard access.
+                </p>
+            </div>
+        </article>
+
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                What is the difference between regular and premium users?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    Regular users can browse, review, and place simulated orders. Premium users can also access
+                    premium-only products and premium dashboard features.
+                </p>
+            </div>
+        </article>
+
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                Is the $15 premium upgrade a real payment?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    No. It is a simulated subscription for the project. No real payment gateway or financial transaction is processed.
+                </p>
+            </div>
+        </article>
+
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                Can I leave reviews on products?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    Yes. Logged-in users can submit and update reviews using AJAX without refreshing the full page.
+                </p>
+            </div>
+        </article>
+
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                Does the cart use real checkout?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    No. The shopping cart simulates a purchase and stores order history, but it does not use real card payments,
+                    email notifications, or external payment APIs.
+                </p>
+            </div>
+        </article>
+
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                Can an administrator manage the website?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    Yes. Administrators can access the admin dashboard and the Django admin panel to manage users,
+                    products, categories, reviews, and orders.
+                </p>
+            </div>
+        </article>
+
+        <article class="faq-item">
+            <button type="button" class="faq-question" data-faq-toggle aria-expanded="false">
+                How are products recommended?
+            </button>
+            <div class="faq-answer hidden" data-faq-answer>
+                <p>
+                    The recommender suggests products based on related brand and category matches.
+                </p>
+            </div>
+        </article>
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/faq/faq.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,236 @@
+/* about.css
+   Styles the About page.
+   Includes hero layout, mission/team cards, and the bottom image carousel.
+   Responsive behavior stacks the hero and team grid on smaller screens.
+*/
+
+
+.hero-image-card img {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    object-fit: cover;
+}
+
+.mission-grid,
+.team-grid,
+.highlights-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.mission-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.team-grid,
+.highlights-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mission-card,
+.team-card,
+.highlight-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 18px;
+    display: grid;
+    gap: 10px;
+}
+
+.mission-card h3,
+.team-card h3,
+.highlight-card h3,
+.mission-card p,
+.team-card p,
+.highlight-card p {
+    margin: 0;
+}
+
+.team-photo {
+    width: 100%;
+    max-width: 220px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.team-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: #000000;
+    color: #ffffff;
+}
+
+.about-page {
+    gap: 20px;
+}
+
+.about-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.about-hero-copy,
+.about-hero-media {
+    display: grid;
+    gap: 14px;
+}
+
+.hero-image-card {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.08);
+    position: relative;
+}
+.hero-image-card img {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    object-fit: cover;
+}
+
+.hero-image-card figcaption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.team-card {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+}
+
+.team-card h3,
+.team-card p {
+    margin: 0;
+}
+
+.team-photo {
+    width: 100%;
+    aspect-ratio: 4 / 4;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.about-carousel {
+    display: grid;
+    gap: 16px;
+}
+
+.carousel-viewport {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    min-height: 420px;
+}
+
+.carousel-slide {
+    display: none;
+    position: relative;
+}
+
+.carousel-slide.is-active {
+    display: block;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+}
+
+.carousel-caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.62);
+    color: #ffffff;
+}
+
+.carousel-caption h3,
+.carousel-caption p {
+    margin: 0;
+}
+
+.carousel-caption p {
+    margin-top: 8px;
+}
+
+.carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.carousel-button {
+    min-width: 120px;
+}
+
+.carousel-dots {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.carousel-dot {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.28);
+    cursor: pointer;
+}
+
+.carousel-dot.is-active {
+    background: #ffffff;
+}
+
+@media (max-width: 950px) {
+    .about-hero,
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .carousel-image {
+        height: 280px;
+    }
+
+    .carousel-controls {
+        align-items: stretch;
+    }
+
+    .carousel-dots {
+        width: 100%;
+        justify-content: center;
+    }
+}

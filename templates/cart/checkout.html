@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cart/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="checkout-page stack">
+    <section class="content-card">
+        <h1 class="page-title">Simulated Checkout</h1>
+        <p class="page-subtitle">
+            This project simulates a purchase only. No real payment is processed.
+        </p>
+    </section>
+
+    <section class="checkout-layout">
+        <div class="checkout-items stack">
+            {% for item in items %}
+                <article class="checkout-item-card content-card">
+                    <div class="checkout-item-row">
+                        <div>
+                            <h2 class="checkout-item-title">{{ item.product.name }}</h2>
+                            <p class="checkout-item-meta">
+                                Quantity: {{ item.quantity }} |
+                                Unit Price: €{{ item.product.price }}
+                            </p>
+                        </div>
+
+                        <p class="checkout-item-total">€{{ item.subtotal }}</p>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <aside class="checkout-summary content-card">
+           <h2>Order Summary</h2>
+
+            <div class="checkout-summary-lines">
+                <p class="summary-line total-line">
+                    <span>Cart Total</span>
+                    <strong>€{{ cart.total_price }}</strong>
+                </p>
+
+                {% if active_discount %}
+                    <p class="summary-line">
+                        <span>Coupon Applied</span>
+                        <strong>{{ active_discount.name }}</strong>
+                    </p>
+                    <p class="summary-line">
+                        <span>Discount Applied</span>
+                        <strong>-€{{ discount_amount }}</strong>
+                    </p>
+                {% endif %}
+
+                <p class="summary-line total-line">
+                    <span>Final Total</span>
+                    <strong>€{{ final_total }}</strong>
+                </p>
+            </div>
+
+            <form method="post" class="checkout-form">
+                {% csrf_token %}
+                <button type="submit">Confirm Simulated Purchase</button>
+            </form>
+
+            <a href="/cart/" class="button secondary-button">Back to Cart</a>
+        </aside>
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart/checkout.js' %}"></script>
+{% endblock %}

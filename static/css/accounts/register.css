@@ -1,0 +1,43 @@
+/* register.css
+   Styles the registration page.
+   Reuses the auth layout pattern for registration form fields and actions.
+*/
+
+.auth-page {
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 620px;
+}
+
+.auth-form p {
+    margin-bottom: 16px;
+}
+
+.auth-form input,
+.auth-form select,
+.auth-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.auth-button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #000000;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.auth-links {
+    margin-top: 16px;
+}

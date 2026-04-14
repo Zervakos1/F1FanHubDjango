@@ -1,0 +1,89 @@
+/* contact.css
+   Styles the Contact page.
+   Includes the two-column layout, form validation states, social links, map section, and confirmation box.
+*/
+
+
+.contact-page {
+    gap: 20px;
+}
+
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.contact-form,
+.contact-side {
+    display: grid;
+    gap: 16px;
+}
+
+.field-group {
+    display: grid;
+    gap: 8px;
+}
+
+.field-error {
+    min-height: 18px;
+    margin: 0;
+    font-size: 0.92rem;
+    color: #ffd1d1;
+}
+
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.social-links a {
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #000000;
+    color: #ffffff;
+}
+
+.map-wrap {
+    overflow: hidden;
+    border-radius: 14px;
+    min-height: 320px;
+}
+
+.map-wrap iframe {
+    width: 100%;
+    height: 320px;
+    border: 0;
+}
+
+.contact-confirmation {
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    display: grid;
+    gap: 10px;
+}
+
+.contact-confirmation h3,
+.contact-confirmation p {
+    margin: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.invalid-field {
+    border-color: #ffb3b3;
+}
+
+@media (max-width: 950px) {
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+}

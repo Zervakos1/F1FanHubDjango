@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contact/contact.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="contact-page stack">
+    <section class="content-card">
+        <h1 class="page-title">Contact Us</h1>
+        <p class="page-subtitle">
+            Send a message to the F1 Fan Hub team. This contact form is part of the project demo.
+        </p>
+    </section>
+
+    <section class="contact-layout">
+        <article class="content-card">
+            <h2>Send a Message</h2>
+
+            <form class="contact-form" novalidate data-contact-form>
+                <div class="field-group">
+                    <label for="contact-name">Name</label>
+                    <input type="text" id="contact-name" name="name" maxlength="30" required>
+                    <p class="field-error" data-error-for="name"></p>
+                </div>
+
+                <div class="field-group">
+                    <label for="contact-email">Email</label>
+                    <input type="email" id="contact-email" name="email" maxlength="60" required>
+                    <p class="field-error" data-error-for="email"></p>
+                </div>
+
+                <div class="field-group">
+                    <label for="contact-subject">Subject</label>
+                    <input type="text" id="contact-subject" name="subject" maxlength="60" required>
+                    <p class="field-error" data-error-for="subject"></p>
+                </div>
+
+                <div class="field-group">
+                    <label for="contact-message">Message</label>
+                    <textarea id="contact-message" name="message" rows="5" maxlength="500" required></textarea>
+                    <p class="field-error" data-error-for="message"></p>
+                </div>
+
+                <button type="submit" data-submit-button disabled>Send Message</button>
+            </form>
+
+            <section class="contact-confirmation hidden" data-confirmation-box>
+                <h3>Message Sent</h3>
+                <p><strong>Name:</strong> <span data-confirm="name"></span></p>
+                <p><strong>Email:</strong> <span data-confirm="email"></span></p>
+                <p><strong>Subject:</strong> <span data-confirm="subject"></span></p>
+                <p><strong>Message:</strong></p>
+                <p data-confirm="message"></p>
+            </section>
+        </article>
+
+        <aside class="contact-side stack">
+            <section class="content-card">
+                <h2>Follow Us</h2>
+                <div class="social-links">
+                    <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+                </div>
+            </section>
+
+            <section class="content-card">
+                <h2>Our Location</h2>
+                <div class="map-wrap">
+                    <iframe
+                        title="The American College of Greece location"
+                        src="https://maps.google.com/maps?q=The%20American%20College%20of%20Greece&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </section>
+        </aside>
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/contact/contact.js' %}"></script>
+{% endblock %}

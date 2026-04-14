@@ -1,0 +1,53 @@
+/* wishlist.css
+   Styles the wishlist page.
+   Includes wishlist product cards, image blocks, and wishlist action buttons.
+*/
+
+.wishlist-page {
+    gap: 20px;
+}
+
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.wishlist-card {
+    display: grid;
+    gap: 12px;
+}
+
+.wishlist-card h3,
+.wishlist-card p {
+    margin: 0;
+}
+
+.wishlist-category {
+    color: var(--text-soft);
+}
+
+.wishlist-image-wrap {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.wishlist-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wishlist-actions {
+    display: grid;
+    gap: 10px;
+}
+
+@media (max-width: 900px) {
+    .wishlist-grid {
+        grid-template-columns: 1fr;
+    }
+}

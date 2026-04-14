@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="profile-page stack">
+    <section class="content-card profile-header">
+        <h1 class="page-title">My Profile</h1>
+        <p class="page-subtitle">
+            View and update your personal account information.
+        </p>
+    </section>
+
+    <section class="profile-layout">
+        <article class="content-card profile-summary">
+            <h2>Account Summary</h2>
+
+            <div class="summary-grid">
+                <article class="summary-box">
+                    <p class="summary-label">Username</p>
+                    <p class="summary-value">{{ user.username }}</p>
+                </article>
+
+                <article class="summary-box">
+                    <p class="summary-label">Email</p>
+                    <p class="summary-value">{{ user.email|default:"Not set" }}</p>
+                </article>
+
+                <article class="summary-box">
+                    <p class="summary-label">Role</p>
+                    <p class="summary-value">
+                        {% if user.is_superuser %}
+                            Admin
+                        {% else %}
+                            {{ user.profile.role|title }}
+                        {% endif %}
+                    </p>
+                </article>
+
+                <article class="summary-box">
+                    <p class="summary-label">Phone</p>
+                    <p class="summary-value">{{ user.profile.phone|default:"Not set" }}</p>
+                </article>
+
+                <article class="summary-box">
+                    <p class="summary-label">Country</p>
+                    <p class="summary-value">{{ user.profile.country|default:"Not set" }}</p>
+                </article>
+            </div>
+        </article>
+
+        <article class="content-card profile-summary">
+            <h2>Membership</h2>
+
+            {% if user.is_superuser %}
+                <p>Admin accounts already have full access.</p>
+            {% elif user.profile.role == 'premium' %}
+                <p>Your account currently has premium access.</p>
+                <a href="/accounts/cancel-premium/" class="button secondary-button">Cancel Premium</a>
+            {% else %}
+                <p>Your account is currently a normal user account.</p>
+                <a href="/accounts/upgrade/" class="button">Upgrade to Premium</a>
+            {% endif %}
+            {% if user.profile.role == 'premium' %}
+                <article class="summary-box">
+                    <p class="summary-label">Premium Points</p>
+                    <p class="summary-value">{{ user.profile.premium_points }}</p>
+                </article>
+
+                <article class="summary-box">
+                    <p class="summary-label">Lifetime Points</p>
+                    <p class="summary-value">{{ user.profile.lifetime_points }}</p>
+                </article>
+            {% endif %}
+        </article>
+
+        <article class="content-card profile-form-card">
+            <h2>Edit Profile</h2>
+
+            <form method="post" class="profile-form">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label for="{{ user_form.username.id_for_label }}">Username</label>
+                    {{ user_form.username }}
+                </div>
+
+                <div class="field-group">
+                    <label for="{{ user_form.email.id_for_label }}">Email</label>
+                    {{ user_form.email }}
+                </div>
+
+                <div class="field-group">
+                    <label for="{{ profile_form.phone.id_for_label }}">Phone</label>
+                    {{ profile_form.phone }}
+                </div>
+
+                <div class="field-group">
+                    <label for="{{ profile_form.country.id_for_label }}">Country</label>
+                    {{ profile_form.country }}
+                </div>
+
+                <button type="submit">Save Changes</button>
+            </form>
+        </article>
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/profile/profile.js' %}"></script>
+{% endblock %}

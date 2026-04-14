@@ -1,0 +1,82 @@
+/* user_dashboard.css
+   Styles the regular user dashboard.
+   Includes summary boxes, recent orders, recently viewed products, and dashboard action buttons.
+*/
+
+.dashboard-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.dashboard-intro,
+.dashboard-summary {
+    display: grid;
+    gap: 16px;
+}
+
+.dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.summary-box {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.summary-label,
+.summary-value,
+.order-mini-card h3,
+.order-mini-card p,
+.order-mini-total {
+    margin: 0;
+}
+
+.summary-label {
+    color: var(--text-soft);
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.orders-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.order-mini-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.order-mini-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.order-mini-total {
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}

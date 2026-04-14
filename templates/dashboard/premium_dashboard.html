@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Premium Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/premium_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-grid">
+    <section class="content-card dashboard-intro">
+        <h1 class="page-title">Premium Dashboard</h1>
+        <p class="page-subtitle">
+            Welcome, {{ user.username }}. You have access to premium-only products and exclusive F1 experiences.
+        </p>
+
+        <div class="dashboard-actions">
+            <a href="/catalog/" class="button">Browse Catalogue</a>
+            <a href="/cart/" class="button">Open Cart</a>
+            <a href="/cart/orders/" class="button">View Orders</a>
+                    </div>
+    </section>
+
+    <section class="content-card">
+        <h2>Premium Status</h2>
+
+        {% if active_subscription %}
+            <div class="status-box">
+                <p><strong>Plan:</strong> {{ active_subscription.plan_name }}</p>
+                <p><strong>Price:</strong> ${{ active_subscription.price }}</p>
+                <p><strong>Started:</strong> {{ active_subscription.started_at }}</p>
+                <p><strong>Status:</strong> Active</p>
+                <p><strong>Wishlist items:</strong> {{ wishlist_count }}</p>
+            </div>
+        {% else %}
+            <div class="status-box">
+                <p><strong>Status:</strong> Premium</p>
+                <p><strong>Wishlist items:</strong> {{ wishlist_count }}</p>
+                <p>Your account currently has premium access.</p>
+            </div>
+        {% endif %}
+
+        <a href="/accounts/cancel-premium/" class="button secondary-button">Cancel Premium</a>
+    </section>
+
+    <section class="content-card vip-rewards-panel">
+    <h2>VIP Rewards</h2>
+
+    <div class="vip-points-grid">
+        <article class="vip-points-box">
+            <h3>Current Points</h3>
+            <p class="vip-points-value">{{ user.profile.premium_points }}</p>
+        </article>
+
+        <article class="vip-points-box">
+            <h3>Lifetime Points</h3>
+            <p class="vip-points-value">{{ user.profile.lifetime_points }}</p>
+        </article>
+
+        <article class="vip-points-box">
+            <h3>Total Raffle Entries</h3>
+            <p class="vip-points-value">{{ raffle_entries_count }}</p>
+        </article>
+
+        <article class="vip-points-box">
+            <h3>Won Raffles</h3>
+            <p class="vip-points-value">{{ won_raffles_count }}</p>
+        </article>
+    </div>
+
+    <div class="vip-actions">
+        <form method="post" action="/accounts/redeem-discount/">
+            {% csrf_token %}
+            <button type="submit">Redeem $10 Discount (200 pts)</button>
+        </form>
+
+        <form method="post" action="/accounts/join-raffle/">
+            {% csrf_token %}
+            <button type="submit">Join Ticket Raffle (100 pts)</button>
+        </form>
+    </div>
+</section>
+
+<section class="content-card">
+        <h2>My Rewards Activity</h2>
+
+        <h3>Unused Discounts</h3>
+        {% if discount_rewards %}
+            <div class="orders-stack">
+                {% for reward in discount_rewards %}
+                    <article class="order-mini-card">
+                        <div class="order-mini-top">
+                            <div>
+                                <h3>{{ reward.name }}</h3>
+                                <p>Created: {{ reward.created_at }}</p>
+                            </div>
+                            <p class="order-mini-total">€{{ reward.discount_amount }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No unused discounts yet.</p>
+        {% endif %}
+
+        <h3>Raffle Entries</h3>
+        {% if raffle_entries %}
+            <div class="orders-stack">
+                {% for entry in raffle_entries %}
+                    <article class="order-mini-card">
+                        <div class="order-mini-top">
+                            <div>
+                                <h3>{{ entry.prize_name }}</h3>
+                                <p>{{ entry.created_at }}</p>
+                            </div>
+                            <p class="order-mini-total">{{ entry.status|title }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No raffle entries yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="content-card">
+        <h2>Premium-Only Products</h2>
+
+        {% if premium_products %}
+            <div class="premium-grid">
+                {% for product in premium_products %}
+                    <article class="premium-card">
+                        <p class="premium-category">
+                            {% if product.category.parent %}
+                                {{ product.category.parent.name }} / {{ product.category.name }}
+                            {% else %}
+                                {{ product.category.name }}
+                            {% endif %}
+                        </p>
+                        <h3>{{ product.name }}</h3>
+                        <p>€{{ product.price }}</p>
+                        <a href="/catalog/{{ product.slug }}/" class="button">View Product</a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No premium items available yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="content-card">
+        <h2>Recent Orders</h2>
+
+        {% if recent_orders %}
+            <div class="orders-stack">
+                {% for order in recent_orders %}
+                    <article class="order-mini-card">
+                        <div class="order-mini-top">
+                            <div>
+                                <h3>Order #{{ order.id }}</h3>
+                                <p>{{ order.created_at }}</p>
+                            </div>
+                            <p class="order-mini-total">€{{ order.total_amount }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No premium orders yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="content-card">
+        <h2>Recently Viewed</h2>
+
+        {% if recently_viewed %}
+            <div class="orders-stack">
+                {% for entry in recently_viewed %}
+                    <article class="order-mini-card">
+                        <div class="order-mini-top">
+                            <div>
+                                <h3>{{ entry.product.name }}</h3>
+                                <p>{{ entry.viewed_at }}</p>
+                            </div>
+                            <a href="/catalog/{{ entry.product.slug }}/" class="button">Open</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No recently viewed products yet.</p>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard/premium_dashboard.js' %}"></script>
+{% endblock %}

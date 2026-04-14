@@ -1,0 +1,139 @@
+.visitor-dashboard {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.visitor-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.featured-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.featured-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.featured-card h3,
+.featured-card p {
+    margin: 0;
+}
+
+.featured-category {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+}
+
+.featured-image-wrap {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.featured-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.next-race-card,
+.race-content,
+.race-widget {
+    display: grid;
+    gap: 10px;
+}
+
+.race-content h3,
+.race-content p,
+.race-loading,
+.race-error {
+    margin: 0;
+}
+
+.home-carousel {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
+    align-items: center;
+    margin-top: 18px;
+}
+
+.home-carousel-track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 1fr);
+    gap: 16px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 6px;
+    align-items: stretch;
+    scrollbar-width: thin
+}
+
+.home-carousel-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    height: 100%;
+    padding: 16px;
+    display: grid;
+    gap: 10px;
+    min-width: 220px;
+}
+
+.home-carousel-card h3,
+.home-carousel-card p {
+    margin: 0;
+}
+
+.home-carousel-image-wrap {
+    width: 100%;
+    aspect-ratio: 4 / 4;
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.home-carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-nav {
+    min-width: 110px;
+}
+
+@media (max-width: 900px) {
+    .home-carousel {
+        grid-template-columns: 1fr;
+    }
+
+    .carousel-nav {
+        width: 100%;
+    }
+    .featured-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.hidden {
+    display: none;
+}

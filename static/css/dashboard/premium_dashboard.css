@@ -1,0 +1,126 @@
+/* premium_dashboard.css
+   Styles the premium dashboard.
+   Includes premium status, VIP rewards panel, points grid, premium products, and recent activity sections.
+*/
+
+.dashboard-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.dashboard-intro {
+    display: grid;
+    gap: 16px;
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    background:
+        linear-gradient(135deg, rgba(201, 162, 39, 0.16), rgba(255, 255, 255, 0.04));
+}
+
+.dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.status-box {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(201, 162, 39, 0.10);
+    border: 1px solid rgba(201, 162, 39, 0.26);
+}
+
+.status-box p,
+.premium-card h3,
+.premium-card p,
+.order-mini-card h3,
+.order-mini-card p,
+.order-mini-total,
+.vip-points-box p,
+.vip-points-box h3 {
+    margin: 0;
+}
+
+.vip-rewards-panel {
+    display: grid;
+    gap: 18px;
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    background:
+        linear-gradient(145deg, rgba(201, 162, 39, 0.14), rgba(255, 255, 255, 0.04));
+}
+
+.vip-points-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.vip-points-box {
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(201, 162, 39, 0.22);
+    display: grid;
+    gap: 8px;
+}
+
+.vip-points-value {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #f5d76e;
+}
+
+.vip-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.premium-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.premium-card,
+.order-mini-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.premium-card {
+    border-color: rgba(201, 162, 39, 0.22);
+}
+
+.premium-category {
+    color: #f3d6d6;
+}
+
+.orders-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.order-mini-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.order-mini-total {
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .premium-grid,
+    .vip-points-grid {
+        grid-template-columns: 1fr;
+    }
+}

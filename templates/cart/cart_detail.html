@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Cart{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cart/cart_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="cart-page stack">
+    <section class="content-card">
+        <h1 class="page-title">My Cart</h1>
+        <p class="page-subtitle">
+            Review your selected items, update quantities, or continue to simulated checkout.
+        </p>
+    </section>
+
+    {% if items %}
+        <section class="cart-layout">
+            <div class="cart-items stack">
+                {% for item in items %}
+                    <article class="cart-item-card content-card">
+                        <div class="cart-item-top">
+                            <div>
+                                <h2 class="cart-item-title">{{ item.product.name }}</h2>
+                                <p class="cart-item-meta">
+                                    Brand: {{ item.product.brand|default:"-" }} |
+                                    Category: {{ item.product.category.name }}
+                                </p>
+                            </div>
+
+                            <div class="cart-price-box">
+                                <p class="cart-price">€{{ item.product.price }}</p>
+                                <p class="cart-stock">
+                                    {% if item.product.stock > 0 %}
+                                        Stock: {{ item.product.stock }}
+                                    {% else %}
+                                        Out of stock
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
+                        <p class="cart-subtotal">Subtotal: €{{ item.subtotal }}</p>
+
+                        <div class="cart-actions-row">
+                            <form method="post" action="/cart/update/{{ item.id }}/" class="quantity-form">
+                                {% csrf_token %}
+                                <div class="field-group quantity-group">
+                                    <label for="quantity-{{ item.id }}">Quantity</label>
+                                    <input
+                                        type="number"
+                                        id="quantity-{{ item.id }}"
+                                        name="quantity"
+                                        min="1"
+                                        max="{{ item.product.stock }}"
+                                        value="{{ item.quantity }}"
+                                    >
+                                </div>
+
+                                <button type="submit">Update</button>
+                            </form>
+
+                            <form method="post" action="/cart/remove/{{ item.id }}/" class="remove-form">
+                                {% csrf_token %}
+                                <button type="submit" class="secondary-button">Remove</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <aside class="cart-summary content-card">
+                <h2>Cart Summary</h2>
+                <p class="summary-line">
+                    <span>Total items</span>
+                    <strong>{{ items|length }}</strong>
+                </p>
+                <p class="summary-line total-line">
+                    <span>Total price</span>
+                    <strong>€{{ cart.total_price }}</strong>
+                </p>
+
+                <div class="summary-actions">
+                    <a href="/catalog/" class="button secondary-button">Continue Shopping</a>
+                    <a href="/cart/checkout/" class="button">Proceed to Checkout</a>
+                </div>
+            </aside>
+        </section>
+    {% else %}
+        <section class="empty-cart content-card">
+            <h2>Your cart is empty</h2>
+            <p>Add products from the catalogue to start a simulated purchase.</p>
+            <a href="/catalog/" class="button">Browse Catalogue</a>
+        </section>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart/cart_detail.js' %}"></script>
+{% endblock %}

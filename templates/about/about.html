@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about/about.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="about-page stack">
+    <section class="content-card about-hero">
+        <div class="about-hero-copy">
+            <h1 class="page-title">About F1 Fan Hub</h1>
+            <p class="page-subtitle">
+                F1 Fan Hub helps fans organize race weekends, manage watch parties, and track personal plans with clear analytics.
+            </p>
+            <p>
+                The website demonstrates Django structure, database-backed features, modular JavaScript, reusable CSS,
+                role-based dashboards, simulated purchases, and responsive design.
+            </p>
+        </div>
+
+        <div class="about-hero-media">
+            <figure class="hero-image-card">
+                <img
+                    src="https://media.formula1.com/image/upload/t_16by9Centre/c_lfill,w_3392/q_auto/v1740000000/fom-website/2025/Ferrari/Ferrari%20SF-25%20launch%20renders/F677_still_02_v11_169.webp"
+                    alt="Ferrari SF-25 Formula 1 car"
+                >
+                <figcaption>Ferrari SF-25 — engineering excellence and racing heritage</figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <section class="content-card">
+        <h2>Meet the Team</h2>
+
+        <div class="team-grid">
+            <article class="team-card">
+                <img src="{% static 'images/konstantinos.jpg' %}" alt="Konstantinos Zervakos" class="team-photo">
+                <h3>Konstantinos Zervakos</h3>
+                <p>Information Technology graduate passionate about web development and software engineering.</p>
+                <p><strong>Role:</strong> Full-Stack Developer</p>
+            </article>
+
+            <article class="team-card">
+                <img
+                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800"
+                    alt="Maria Papadopoulou"
+                    class="team-photo"
+                >
+                <h3>Maria Papadopoulou</h3>
+                <p>UI/UX designer responsible for layout design, accessibility, and visual consistency.</p>
+                <p><strong>Role:</strong> UI/UX Designer</p>
+            </article>
+
+            <article class="team-card">
+                <img
+                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800"
+                    alt="Nikos Georgiou"
+                    class="team-photo"
+                >
+                <h3>Nikos Georgiou</h3>
+                <p>Backend developer focusing on APIs, browser compatibility, and data handling.</p>
+                <p><strong>Role:</strong> Backend Developer</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="content-card">
+        <h2>How F1 Fan Hub Helps Fans</h2>
+
+        <div class="about-carousel" data-carousel>
+            <div class="carousel-viewport">
+                <article class="carousel-slide is-active" data-slide>
+                    <img
+                        src="https://d2n9h2wits23hf.cloudfront.net/image/v1/static/6057949432001/3bcdaf49-fa46-44c8-9c1d-9259308b1141/2dd23c0c-eac0-4a3c-adfe-a6305eeff070/864x486/match/image.jpg"
+                        alt="Race weekend excitement"
+                        class="carousel-image"
+                    >
+                    <div class="carousel-caption">
+                        <h3>Stay Ready for Race Weekend</h3>
+                        <p>The home page highlights the next Grand Prix so fans can plan ahead.</p>
+                    </div>
+                </article>
+
+                <article class="carousel-slide" data-slide>
+                    <img
+                        src="https://picsum.photos/id/1060/1600/700"
+                        alt="Planning checklist"
+                        class="carousel-image"
+                    >
+                    <div class="carousel-caption">
+                        <h3>Turn Ideas Into Action</h3>
+                        <p>Create watch parties, meetups, travel checklists, and race reminders.</p>
+                    </div>
+                </article>
+
+                <article class="carousel-slide" data-slide>
+                    <img
+                        src="https://picsum.photos/id/180/1600/700"
+                        alt="Analytics dashboard charts"
+                        class="carousel-image"
+                    >
+                    <div class="carousel-caption">
+                        <h3>Track Progress With Analytics</h3>
+                        <p>Dashboards show completed versus pending plans and priority breakdowns.</p>
+                    </div>
+                </article>
+
+                <article class="carousel-slide" data-slide>      
+                    <img
+                        src="https://www.sportstourismnews.com/wp-content/uploads/2025/07/2025-Global-F1-Fan-Survey-fans.jpg"
+                        alt="Formula 1 fan community"
+                        class="carousel-image"
+                    >
+                    <div class="carousel-caption">
+                        <h3>Built for Fan Communities</h3>
+                        <p>Organize events with friends and keep every activity in one clear space.</p>
+                    </div>
+                </article>
+            </div>
+
+            <div class="carousel-controls">
+                <button type="button" class="carousel-button" data-carousel-prev>Previous</button>
+                <div class="carousel-dots" data-carousel-dots>
+                    <button type="button" class="carousel-dot is-active" data-dot aria-label="Slide 1"></button>
+                    <button type="button" class="carousel-dot" data-dot aria-label="Slide 2"></button>
+                    <button type="button" class="carousel-dot" data-dot aria-label="Slide 3"></button>
+                    <button type="button" class="carousel-dot" data-dot aria-label="Slide 4"></button>
+                </div>
+                <button type="button" class="carousel-button" data-carousel-next>Next</button>
+            </div>
+        </div>
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/about/about.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalog/product_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="product-detail-page">
+    <p class="back-links">
+        <a href="/catalog/" class="nav-link">Back to Catalogue</a>
+    </p>
+
+    <section class="product-main-grid">
+        <article class="product-info-card content-card">
+            <div class="product-detail-image-wrap">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail-image">
+                    {% elif product.external_image_url %}
+                        <img src="{{ product.external_image_url }}" alt="{{ product.name }}" class="product-detail-image">
+                    {% else %}
+                        <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-detail-image">
+                    {% endif %}
+                </div>
+            <div class="product-heading">
+                <p class="product-mini-meta">
+                    {% if product.category.parent %}
+                        {{ product.category.parent.name }} / {{ product.category.name }}
+                    {% else %}
+                        {{ product.category.name }}
+                    {% endif %}
+                </p>
+
+                <h1>{{ product.name }}</h1>
+
+                <p class="product-mini-meta">
+                    Brand: {{ product.brand|default:"-" }} |
+                    Color: {{ product.color|default:"-" }} |
+                    Size: {{ product.size|default:"-" }}
+                </p>
+            </div>
+
+            <p class="product-highlight">€{{ product.price }}</p>
+            <p><strong>Stock:</strong> {{ product.stock }}</p>
+
+            {% if product.is_premium_only %}
+                <p><strong>Premium item:</strong> Yes</p>
+            {% else %}
+                <p><strong>Premium item:</strong> No</p>
+            {% endif %}
+        </article>
+
+        <aside class="product-action-card content-card">
+            <h2>Actions</h2>
+
+                {% if user.is_authenticated %}
+                    {% if product.is_premium_only and not has_premium_access %}
+                        <p>This is a premium-only product.</p>
+                        <a href="/accounts/upgrade/" class="button">Upgrade to Premium</a>
+                    {% else %}
+                        <form method="post" action="/cart/add/{{ product.id }}/" class="cart-form">
+                            {% csrf_token %}
+
+                            <div class="field-group">
+                                <label for="quantity">Quantity</label>
+                                <input type="number" id="quantity" name="quantity" min="1" max="{{ product.stock }}" value="1">
+                            </div>
+
+                            <button type="submit">Add to Cart</button>
+                        </form>
+                    {% endif %}
+
+                    {% if is_in_wishlist %}
+                        <a href="/catalog/wishlist/remove/{{ product.id }}/" class="button secondary-button">
+                            Remove from Wishlist
+                        </a>
+                    {% else %}
+                        <a href="/catalog/wishlist/add/{{ product.id }}/" class="button secondary-button">
+                            Add to Wishlist
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <p><a href="/accounts/login/">Login</a> to add this item to your cart or wishlist.</p>
+            {% endif %}
+        </aside>
+    </section>
+
+    <section class="description-section content-card">
+        <h2>Description</h2>
+        <p>{{ product.description }}</p>
+    </section>
+
+    <section class="reviews-section content-card">
+    <h2>Ratings and Reviews</h2>
+    <p>
+        Average rating:
+        <strong id="avgRating">{{ avg_rating }}</strong>/5
+        (<span id="reviewCount">{{ review_count }}</span> review{{ review_count|pluralize }})
+    </p>
+
+    {% if user.is_authenticated %}
+        <div class="review-form-card content-card">
+            <h3>Write a Review</h3>
+
+            <form id="reviewForm" data-product-id="{{ product.id }}">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label for="rating">Rating (1-5)</label>
+                    <select id="rating" name="rating">
+                        <option value="">Select rating</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="comment">Comment</label>
+                    <textarea id="comment" name="comment" rows="4"></textarea>
+                </div>
+
+                <button type="submit">Submit Review</button>
+            </form>
+
+            <p id="reviewMessage"></p>
+        </div>
+    {% else %}
+        <p><a href="/accounts/login/">Login</a> to leave a review.</p>
+    {% endif %}
+
+    <div id="reviewsList" class="review-list">
+        {% if reviews %}
+            {% for review in reviews %}
+                <article class="review-card content-card" id="review-{{ review.user.id }}">
+                    <p><strong>{{ review.user.username }}</strong></p>
+                    <p>Rating: <span class="review-rating">{{ review.rating }}</span>/5</p>
+                    <p class="review-comment">{{ review.comment }}</p>
+                    <p><small>{{ review.created_at }}</small></p>
+                </article>
+            {% endfor %}
+        {% else %}
+            <p id="noReviewsText">No reviews yet.</p>
+        {% endif %}
+    </div>
+</section>
+
+    <section class="related-section content-card">
+        <h2>Recommended for You</h2>
+
+        {% if recommendations %}
+            <ul class="related-list">
+                {% for item in recommendations %}
+                    <li>
+                        <a href="/catalog/{{ item.slug }}/">{{ item.name }}</a>
+                        - €{{ item.price }}
+                        {% if item.is_premium_only %}(Premium){% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No recommendations available yet.</p>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/catalog/product_detail.js' %}"></script>
+{% endblock %}

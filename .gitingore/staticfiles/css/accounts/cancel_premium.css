@@ -1,0 +1,16 @@
+.cancel-page {
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+}
+
+.cancel-card {
+    width: 100%;
+    max-width: 700px;
+    display: grid;
+    gap: 18px;
+}
+
+.cancel-form {
+    display: grid;
+}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/user_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-grid">
+    <section class="content-card dashboard-intro">
+        <h1 class="page-title">User Dashboard</h1>
+        <p class="page-subtitle">
+            Welcome back, {{ user.username }}. Manage your cart, browse products, and review your recent simulated orders.
+        </p>
+
+        <div class="dashboard-actions">
+            <a href="/catalog/" class="button">Browse Catalogue</a>
+            <a href="/cart/" class="button">Open Cart</a>
+            <a href="/accounts/upgrade/" class="button">Upgrade to Premium</a>
+            <a href="/catalog/wishlist/" class="button">My Wishlist</a>
+        </div>
+    </section>
+
+    <section class="content-card dashboard-summary">
+        <h2>Quick Summary</h2>
+        <div class="summary-grid">
+            <article class="summary-box">
+                <p class="summary-label">Cart Items</p>
+                <p class="summary-value">{{ cart_items_count }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Cart Total</p>
+                <p class="summary-value">€{{ cart.total_price }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Orders</p>
+                <p class="summary-value">{{ recent_order_count }}</p>
+            </article>
+
+            <article class="summary-box">
+                <p class="summary-label">Wishlist</p>
+                <p class="summary-value">{{ wishlist_count }}</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="content-card">
+        <h2>Current Cart</h2>
+
+        {% if cart_items %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>€{{ item.product.price }}</td>
+                                <td>€{{ item.subtotal }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>Your cart is currently empty.</p>
+        {% endif %}
+    </section>
+
+    <section class="content-card">
+        <h2>Recent Orders</h2>
+
+        {% if recent_orders %}
+            <div class="orders-stack">
+                {% for order in recent_orders %}
+                    <article class="order-mini-card">
+                        <div class="order-mini-top">
+                            <div>
+                                <h3>Order #{{ order.id }}</h3>
+                                <p>{{ order.created_at }}</p>
+                            </div>
+                            <p class="order-mini-total">€{{ order.total_amount }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No orders yet. Complete a simulated purchase to see your history here.</p>
+        {% endif %}
+    </section>
+
+    <section class="content-card">
+    <h2>Recently Viewed</h2>
+
+    {% if recently_viewed %}
+        <div class="orders-stack">
+            {% for entry in recently_viewed %}
+                <article class="order-mini-card">
+                    <div class="order-mini-top">
+                        <div>
+                            <h3>{{ entry.product.name }}</h3>
+                            <p>{{ entry.viewed_at }}</p>
+                        </div>
+                        <a href="/catalog/{{ entry.product.slug }}/" class="button">Open</a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+            {% else %}
+                <p>No recently viewed products yet.</p>
+            {% endif %}
+        </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard/user_dashboard.js' %}"></script>
+{% endblock %}
