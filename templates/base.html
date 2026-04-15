@@ -6,89 +6,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="F1 Fan Hub Django project with catalogue, dashboards, reviews, cart features, and premium membership.">
     <meta name="keywords" content="F1, Formula 1, Django, catalogue, reviews, shopping cart, premium, dashboard">
-    <meta name="author" content="Your Name">
+    <meta name="author" content="Konstantinos Zervakos">
+    <meta name="robots" content="index, follow">
     <title>{% block title %}F1 Fan Hub{% endblock %}</title>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/common/base.css' %}">
     {% block extra_css %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{% static 'js/common/base.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
+    
 </head>
-<body
-    data-user-role="{% if not user.is_authenticated %}visitor{% elif user.is_superuser %}admin{% else %}{{ user.profile.role }}{% endif %}">
+<body data-user-role="{% if not user.is_authenticated %}visitor{% elif user.is_superuser %}admin{% else %}{{ user.profile.role }}{% endif %}">
     <header class="site-header">
-    <nav class="navbar">
-        <div class="nav-group">
-            <a href="/" class="nav-link {% if request.path == '/' %}nav-link-active{% endif %}">Home</a>
+        <nav class="navbar">
+            <div class="nav-group">
+                <a href="{% url 'dashboard:public-dashboard' %}"
+                   class="nav-link {% if request.resolver_match.view_name == 'dashboard:public-dashboard' %}nav-link-active{% endif %}">
+                    Home
+                </a>
 
-            <a href="/catalog/" class="nav-link {% if '/catalog/' in request.path and '/catalog/wishlist/' not in request.path %}nav-link-active{% endif %}">
-                Catalogue
-            </a>
+                <a href="{% url 'catalog:product-list' %}"
+                   class="nav-link {% if request.resolver_match.view_name == 'catalog:product-list' or request.resolver_match.view_name == 'catalog:product-detail' %}nav-link-active{% endif %}">
+                    Catalogue
+                </a>
 
-            <div class="nav-dropdown" data-dropdown>
-                <button type="button" class="nav-link nav-dropdown-toggle" data-dropdown-toggle>
-                    Info
-                </button>
-
-                <div class="nav-dropdown-menu" data-dropdown-menu>
-                    <a href="/about/" class="nav-dropdown-link {% if '/about/' in request.path %}nav-link-active{% endif %}">
-                        About
-                    </a>
-                    <a href="/contact/" class="nav-dropdown-link {% if '/contact/' in request.path %}nav-link-active{% endif %}">
-                        Contact
-                    </a>
-                    <a href="/faq/" class="nav-dropdown-link {% if '/faq/' in request.path %}nav-link-active{% endif %}">
-                        FAQ
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-group nav-group-right">
-            <button type="button" class="nav-link nav-button theme-toggle" data-theme-toggle>
-                Dark Mode
-            </button>
-
-            {% if user.is_authenticated %}
                 <div class="nav-dropdown" data-dropdown>
                     <button type="button" class="nav-link nav-dropdown-toggle" data-dropdown-toggle>
-                        Account
+                        Info
                     </button>
 
                     <div class="nav-dropdown-menu" data-dropdown-menu>
-                        <a href="/my-dashboard/" class="nav-dropdown-link {% if '/my-dashboard/' in request.path or '/dashboard/' in request.path %}nav-link-active{% endif %}">
-                            My Dashboard
+                        <a href="{% url 'about' %}"
+                           class="nav-dropdown-link {% if request.resolver_match.view_name == 'about' %}nav-link-active{% endif %}">
+                            About
                         </a>
 
-                        <a href="/accounts/profile/" class="nav-dropdown-link {% if '/accounts/profile/' in request.path %}nav-link-active{% endif %}">
-                            Profile
+                        <a href="{% url 'contact' %}"
+                           class="nav-dropdown-link {% if request.resolver_match.view_name == 'contact' %}nav-link-active{% endif %}">
+                            Contact
                         </a>
 
-                        <a href="/cart/" class="nav-dropdown-link {% if '/cart/' in request.path and '/cart/orders/' not in request.path and '/cart/checkout/' not in request.path %}nav-link-active{% endif %}">
-                            My Cart
-                        </a>
-
-                        <a href="/catalog/wishlist/" class="nav-dropdown-link {% if '/catalog/wishlist/' in request.path %}nav-link-active{% endif %}">
-                            Wishlist
-                        </a>
-
-                        <a href="/cart/orders/" class="nav-dropdown-link {% if '/cart/orders/' in request.path %}nav-link-active{% endif %}">
-                            Orders
+                        <a href="{% url 'faq' %}"
+                           class="nav-dropdown-link {% if request.resolver_match.view_name == 'faq' %}nav-link-active{% endif %}">
+                            FAQ
                         </a>
                     </div>
                 </div>
+            </div>
 
-                <a href="/accounts/logout/" class="nav-link nav-button">Logout</a>
-            {% else %}
-                <a href="/accounts/login/" class="nav-link nav-button {% if '/accounts/login/' in request.path %}nav-link-active{% endif %}">
-                    Login
-                </a>
+            <div class="nav-group nav-group-right">
+                <button type="button" class="nav-link nav-button theme-toggle" data-theme-toggle>
+                    Dark Mode
+                </button>
 
-                <a href="/accounts/register/" class="nav-link nav-button {% if '/accounts/register/' in request.path %}nav-link-active{% endif %}">
-                    Register
-                </a>
-            {% endif %}
-        </div>
-    </nav>
-</header>
+                {% if user.is_authenticated %}
+                    <div class="nav-dropdown" data-dropdown>
+                        <button type="button" class="nav-link nav-dropdown-toggle" data-dropdown-toggle>
+                            Account
+                        </button>
+
+                        <div class="nav-dropdown-menu" data-dropdown-menu>
+                            <a href="{% url 'dashboard:dashboard-router' %}"
+                               class="nav-dropdown-link {% if request.resolver_match.view_name == 'dashboard:dashboard-router' or request.resolver_match.view_name == 'dashboard:user-dashboard' or request.resolver_match.view_name == 'dashboard:premium-dashboard' or request.resolver_match.view_name == 'dashboard:admin-dashboard' %}nav-link-active{% endif %}">
+                                My Dashboard
+                            </a>
+
+                            <a href="{% url 'accounts:profile' %}"
+                               class="nav-dropdown-link {% if request.resolver_match.view_name == 'accounts:profile' %}nav-link-active{% endif %}">
+                                Profile
+                            </a>
+
+                            <a href="{% url 'cart:cart-detail' %}"
+                               class="nav-dropdown-link {% if request.resolver_match.view_name == 'cart:cart-detail' or request.resolver_match.view_name == 'cart:update-cart-item' or request.resolver_match.view_name == 'cart:remove-cart-item' %}nav-link-active{% endif %}">
+                                My Cart
+                            </a>
+
+                            <a href="{% url 'catalog:wishlist-detail' %}"
+                               class="nav-dropdown-link {% if request.resolver_match.view_name == 'catalog:wishlist-detail' or request.resolver_match.view_name == 'catalog:add-to-wishlist' or request.resolver_match.view_name == 'catalog:remove-from-wishlist' %}nav-link-active{% endif %}">
+                                Wishlist
+                            </a>
+
+                            <a href="{% url 'cart:order-history' %}"
+                               class="nav-dropdown-link {% if request.resolver_match.view_name == 'cart:order-history' or request.resolver_match.view_name == 'cart:checkout' %}nav-link-active{% endif %}">
+                                Orders
+                            </a>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'accounts:logout' %}" class="nav-link nav-button">
+                        Logout
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}"
+                       class="nav-link nav-button {% if request.resolver_match.view_name == 'accounts:login' %}nav-link-active{% endif %}">
+                        Login
+                    </a>
+
+                    <a href="{% url 'accounts:register' %}"
+                       class="nav-link nav-button {% if request.resolver_match.view_name == 'accounts:register' %}nav-link-active{% endif %}">
+                        Register
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
 
     <main class="page-shell">
         {% if messages %}
@@ -103,8 +127,5 @@
     </main>
 
     <div class="footer-space"></div>
-
-    <script src="{% static 'js/common/base.js' %}"></script>
-    {% block extra_js %}{% endblock %}
 </body>
 </html>

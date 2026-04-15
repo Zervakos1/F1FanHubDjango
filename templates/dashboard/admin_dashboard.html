@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/dashboard/admin_dashboard.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/dashboard/admin_dashboard.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="dashboard-grid">
     <section class="content-card dashboard-intro">
@@ -17,7 +21,7 @@
 
         <div class="dashboard-actions">
             <a href="/admin/" class="button">Open Django Admin</a>
-            <a href="/catalog/" class="button">View Catalogue</a>
+            <a href="{% url 'catalog:product-list' %}" class="button">View Catalogue</a>
         </div>
     </section>
 
@@ -90,8 +94,4 @@
         {% endif %}
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/dashboard/admin_dashboard.js' %}"></script>
 {% endblock %}

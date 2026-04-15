@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/about/about.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/about/about.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="about-page stack">
     <section class="content-card about-hero">
@@ -108,7 +112,7 @@
                     </div>
                 </article>
 
-                <article class="carousel-slide" data-slide>      
+                <article class="carousel-slide" data-slide>
                     <img
                         src="https://www.sportstourismnews.com/wp-content/uploads/2025/07/2025-Global-F1-Fan-Survey-fans.jpg"
                         alt="Formula 1 fan community"
@@ -134,8 +138,4 @@
         </div>
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/about/about.js' %}"></script>
 {% endblock %}

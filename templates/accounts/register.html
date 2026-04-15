@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/accounts/register.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/accounts/register.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="auth-page">
     <div class="auth-card content-card">
@@ -19,12 +23,8 @@
         </form>
 
         <div class="auth-links">
-            <a href="/accounts/login/">Already have an account? Login</a>
+            <a href="{% url 'accounts:login' %}">Already have an account? Login</a>
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/accounts/register.js' %}"></script>
 {% endblock %}

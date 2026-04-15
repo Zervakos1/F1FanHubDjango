@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/contact/contact.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/contact/contact.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="contact-page stack">
     <section class="content-card">
@@ -81,8 +85,4 @@
         </aside>
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/contact/contact.js' %}"></script>
 {% endblock %}

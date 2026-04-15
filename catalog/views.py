@@ -1,21 +1,23 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Avg, Q
 from django.contrib.auth.decorators import login_required
-from .models import Product, Category, RecentlyViewed, Wishlist
+from django.db.models import Avg, Q
+from django.shortcuts import render, get_object_or_404, redirect
+
 from reviews.models import Review
+from .models import Product, Category, RecentlyViewed, Wishlist
 
 
 def product_list(request):
-    products = Product.objects.select_related('category', 'category__parent').all().order_by('name')
-    parent_categories = Category.objects.filter(parent__isnull=True).prefetch_related('subcategories').order_by('name')
+    # Product catalogue with search and filter support.
+    products = Product.objects.select_related("category", "category__parent").all().order_by("name")
+    parent_categories = Category.objects.filter(parent__isnull=True).prefetch_related("subcategories").order_by("name")
 
-    q = request.GET.get('q', '').strip()
-    brand = request.GET.get('brand', '').strip()
-    color = request.GET.get('color', '').strip()
-    size = request.GET.get('size', '').strip()
-    min_price = request.GET.get('min_price', '').strip()
-    max_price = request.GET.get('max_price', '').strip()
-    category_slug = request.GET.get('category', '').strip()
+    q = request.GET.get("q", "").strip()
+    brand = request.GET.get("brand", "").strip()
+    color = request.GET.get("color", "").strip()
+    size = request.GET.get("size", "").strip()
+    min_price = request.GET.get("min_price", "").strip()
+    max_price = request.GET.get("max_price", "").strip()
+    category_slug = request.GET.get("category", "").strip()
 
     selected_category = None
 
@@ -42,23 +44,24 @@ def product_list(request):
 
         if selected_category:
             if selected_category.parent is None:
-                child_ids = selected_category.subcategories.values_list('id', flat=True)
+                child_ids = selected_category.subcategories.values_list("id", flat=True)
                 products = products.filter(Q(category=selected_category) | Q(category_id__in=child_ids))
             else:
                 products = products.filter(category=selected_category)
 
     context = {
-        'products': products,
-        'parent_categories': parent_categories,
-        'selected_category': selected_category,
+        "products": products,
+        "parent_categories": parent_categories,
+        "selected_category": selected_category,
     }
-    return render(request, 'catalog/product_list.html', context)
+    return render(request, "catalog/product_list.html", context)
 
 
 def product_detail(request, slug):
+    # Detailed product page with recommendations, reviews, and wishlist state.
     product = get_object_or_404(
-        Product.objects.select_related('category', 'category__parent'),
-        slug=slug
+        Product.objects.select_related("category", "category__parent"),
+        slug=slug,
     )
 
     has_premium_access = False
@@ -73,18 +76,18 @@ def product_detail(request, slug):
         RecentlyViewed.objects.update_or_create(
             user=request.user,
             product=product,
-            defaults={}
+            defaults={},
         )
 
         wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
         is_in_wishlist = wishlist.products.filter(id=product.id).exists()
 
-    reviews = product.reviews.select_related('user').order_by('-created_at')
-    avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
+    reviews = product.reviews.select_related("user").order_by("-created_at")
+    avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"] or 0
 
     same_brand_same_category = Product.objects.filter(
         brand=product.brand,
-        category=product.category
+        category=product.category,
     ).exclude(id=product.id)
 
     same_brand = Product.objects.filter(
@@ -114,21 +117,22 @@ def product_detail(request, slug):
             break
 
     context = {
-        'product': product,
-        'reviews': reviews,
-        'avg_rating': round(avg_rating, 1),
-        'review_count': reviews.count(),
-        'recommendations': recommendations,
-        'is_in_wishlist': is_in_wishlist,
-        'has_premium_access': has_premium_access,
+        "product": product,
+        "reviews": reviews,
+        "avg_rating": round(avg_rating, 1),
+        "review_count": reviews.count(),
+        "recommendations": recommendations,
+        "is_in_wishlist": is_in_wishlist,
+        "has_premium_access": has_premium_access,
     }
-    return render(request, 'catalog/product_detail.html', context)
+    return render(request, "catalog/product_detail.html", context)
+
 
 @login_required
 def wishlist_detail(request):
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
-    products = wishlist.products.select_related('category', 'category__parent').order_by('name')
-    return render(request, 'catalog/wishlist.html', {'wishlist_products': products})
+    products = wishlist.products.select_related("category", "category__parent").order_by("name")
+    return render(request, "catalog/wishlist.html", {"wishlist_products": products})
 
 
 @login_required
@@ -136,7 +140,7 @@ def add_to_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
     wishlist.products.add(product)
-    return redirect('wishlist-detail')
+    return redirect("catalog:wishlist-detail")
 
 
 @login_required
@@ -144,4 +148,4 @@ def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
     wishlist.products.remove(product)
-    return redirect('wishlist-detail')
+    return redirect("catalog:wishlist-detail")

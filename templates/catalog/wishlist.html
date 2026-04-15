@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/catalog/wishlist.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/catalog/wishlist.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="wishlist-page stack">
     <section class="content-card">
@@ -40,8 +44,8 @@
                     <p>€{{ product.price }}</p>
 
                     <div class="wishlist-actions">
-                        <a href="/catalog/{{ product.slug }}/" class="button">View</a>
-                        <a href="/catalog/wishlist/remove/{{ product.id }}/" class="button secondary-button">Remove</a>
+                        <a href="{% url 'catalog:product-detail' product.slug %}" class="button">View</a>
+                        <a href="{% url 'catalog:remove-from-wishlist' product.id %}" class="button secondary-button">Remove</a>
                     </div>
                 </article>
             {% endfor %}
@@ -50,12 +54,8 @@
         <section class="content-card">
             <h2>Your wishlist is empty</h2>
             <p>Save products from the catalogue to view them here later.</p>
-            <a href="/catalog/" class="button">Browse Catalogue</a>
+            <a href="{% url 'catalog:product-list' %}" class="button">Browse Catalogue</a>
         </section>
     {% endif %}
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/catalog/wishlist.js' %}"></script>
 {% endblock %}

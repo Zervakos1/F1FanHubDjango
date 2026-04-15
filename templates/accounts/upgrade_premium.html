@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/accounts/upgrade_premium.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/accounts/upgrade_premium.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="upgrade-page">
     <article class="upgrade-card content-card">
@@ -28,8 +32,4 @@
         </form>
     </article>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/accounts/upgrade_premium.js' %}"></script>
 {% endblock %}

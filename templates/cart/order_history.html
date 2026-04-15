@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/cart/order_history.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/cart/order_history.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="orders-page stack">
     <section class="content-card">
@@ -65,12 +69,8 @@
         <section class="content-card">
             <h2>No orders yet</h2>
             <p>You have not completed a simulated purchase yet.</p>
-            <a href="/catalog/" class="button">Browse Catalogue</a>
+            <a href="{% url 'catalog:product-list' %}" class="button">Browse Catalogue</a>
         </section>
     {% endif %}
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/cart/order_history.js' %}"></script>
 {% endblock %}

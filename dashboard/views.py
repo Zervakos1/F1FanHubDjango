@@ -7,19 +7,25 @@ from cart.models import Cart, Order
 from catalog.models import Product, Wishlist
 from reviews.models import Review
 
+
 def sync_user_premium_role(user):
+    # Keep the profile role aligned with the active subscription state.
     has_active_subscription = user.premium_subscriptions.filter(is_active=True).exists()
-    user.profile.role = 'premium' if has_active_subscription else 'user'
+    user.profile.role = "premium" if has_active_subscription else "user"
     user.profile.save()
 
+
 def user_has_premium_access(user):
+    # Premium access is granted to admins or users with an active premium subscription.
     if user.is_superuser:
         return True
     return user.premium_subscriptions.filter(is_active=True).exists()
 
+
 def public_dashboard(request):
-    featured_products = Product.objects.order_by('?')[:6]
-    premium_highlights = Product.objects.filter(is_premium_only=True).order_by('name')[:3]
+    # Public homepage shown to visitors and non-authenticated users.
+    featured_products = Product.objects.order_by("?")[:6]
+    premium_highlights = Product.objects.filter(is_premium_only=True).order_by("name")[:3]
 
     def make_card_image(text, bg, fg="ffffff"):
         safe_text = text.replace(" ", "+")
@@ -65,25 +71,26 @@ def public_dashboard(request):
     ]
 
     context = {
-        'featured_products': featured_products,
-        'premium_highlights': premium_highlights,
-        'driver_cards': driver_cards,
-        'team_cards': team_cards,
+        "featured_products": featured_products,
+        "premium_highlights": premium_highlights,
+        "driver_cards": driver_cards,
+        "team_cards": team_cards,
     }
-    return render(request, 'dashboard/public_dashboard.html', context)
+    return render(request, "dashboard/public_dashboard.html", context)
 
 
 @login_required
 def dashboard_router(request):
+    # Send each user to the correct dashboard by role/subscription.
     if request.user.is_superuser:
-        return redirect('admin-dashboard')
+        return redirect("dashboard:admin-dashboard")
 
     sync_user_premium_role(request.user)
 
     if user_has_premium_access(request.user):
-        return redirect('premium-dashboard')
+        return redirect("dashboard:premium-dashboard")
 
-    return redirect('user-dashboard')
+    return redirect("dashboard:user-dashboard")
 
 
 @login_required
@@ -91,74 +98,81 @@ def user_dashboard(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
-    recent_orders = request.user.orders.prefetch_related('items__product').order_by('-created_at')[:3]
+    recent_orders = request.user.orders.prefetch_related("items__product").order_by("-created_at")[:3]
     recent_order_count = request.user.orders.count()
-    recently_viewed = request.user.recent_views.select_related('product', 'product__category')[:6]
+    recently_viewed = request.user.recent_views.select_related("product", "product__category")[:6]
 
     context = {
-        'cart': cart,
-        'cart_items': cart.items.select_related('product'),
-        'cart_items_count': cart.items.count(),
-        'recent_orders': recent_orders,
-        'recent_order_count': recent_order_count,
-        'recently_viewed': recently_viewed,
-        'wishlist_count': wishlist.products.count(),
+        "cart": cart,
+        "cart_items": cart.items.select_related("product"),
+        "cart_items_count": cart.items.count(),
+        "recent_orders": recent_orders,
+        "recent_order_count": recent_order_count,
+        "recently_viewed": recently_viewed,
+        "wishlist_count": wishlist.products.count(),
     }
-    return render(request, 'dashboard/user_dashboard.html', context)
+    return render(request, "dashboard/user_dashboard.html", context)
 
 
 @login_required
 def premium_dashboard(request):
     if request.user.is_superuser:
-        return redirect('admin-dashboard')
+        return redirect("dashboard:admin-dashboard")
 
     sync_user_premium_role(request.user)
 
     if not user_has_premium_access(request.user):
-        return redirect('user-dashboard')
+        return redirect("dashboard:user-dashboard")
 
     cart, _ = Cart.objects.get_or_create(user=request.user)
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
-    active_subscription = request.user.premium_subscriptions.filter(is_active=True).order_by('-started_at').first()
-    premium_products = Product.objects.filter(is_premium_only=True).order_by('name')[:6]
-    recent_orders = request.user.orders.prefetch_related('items__product').order_by('-created_at')[:3]
-    recently_viewed = request.user.recent_views.select_related('product', 'product__category')[:6]
-    discount_rewards = request.user.discount_rewards.filter(is_used=False).order_by('-created_at')[:5]
-    raffle_entries = request.user.raffle_entries.order_by('-created_at')[:5]
+    active_subscription = request.user.premium_subscriptions.filter(is_active=True).order_by("-started_at").first()
+    premium_products = Product.objects.filter(is_premium_only=True).order_by("name")[:6]
+    recent_orders = request.user.orders.prefetch_related("items__product").order_by("-created_at")[:3]
+    recently_viewed = request.user.recent_views.select_related("product", "product__category")[:6]
+    discount_rewards = request.user.discount_rewards.filter(is_used=False).order_by("-created_at")[:5]
+    raffle_entries = request.user.raffle_entries.order_by("-created_at")[:5]
     raffle_entries_count = request.user.raffle_entries.count()
-    joined_raffles_count = request.user.raffle_entries.filter(status='joined').count()
-    won_raffles_count = request.user.raffle_entries.filter(status='won').count()
+    joined_raffles_count = request.user.raffle_entries.filter(status="joined").count()
+    won_raffles_count = request.user.raffle_entries.filter(status="won").count()
 
     context = {
-        'cart': cart,
-        'cart_items_count': cart.items.count(),
-        'wishlist_count': wishlist.products.count(),
-        'active_subscription': active_subscription,
-        'premium_products': premium_products,
-        'recent_orders': recent_orders,
-        'recently_viewed': recently_viewed,
-        'discount_rewards': discount_rewards,
-        'raffle_entries': raffle_entries,
-        'raffle_entries_count': raffle_entries_count,
-        'joined_raffles_count': joined_raffles_count,
-        'won_raffles_count': won_raffles_count,
+        "cart": cart,
+        "cart_items_count": cart.items.count(),
+        "wishlist_count": wishlist.products.count(),
+        "active_subscription": active_subscription,
+        "premium_products": premium_products,
+        "recent_orders": recent_orders,
+        "recently_viewed": recently_viewed,
+        "discount_rewards": discount_rewards,
+        "raffle_entries": raffle_entries,
+        "raffle_entries_count": raffle_entries_count,
+        "joined_raffles_count": joined_raffles_count,
+        "won_raffles_count": won_raffles_count,
     }
-    return render(request, 'dashboard/premium_dashboard.html', context)
+    return render(request, "dashboard/premium_dashboard.html", context)
 
 
 @login_required
 def admin_dashboard(request):
     if not request.user.is_superuser:
-        return redirect('dashboard-router')
+        return redirect("dashboard:dashboard-router")
+
+    premium_user_count = (
+        PremiumSubscription.objects.filter(is_active=True)
+        .values("user")
+        .distinct()
+        .count()
+    )
 
     context = {
-        'total_users': User.objects.filter(is_superuser=False).count(),
-        'premium_users': User.objects.filter(profile__role='premium', is_superuser=False).count(),
-        'total_products': Product.objects.count(),
-        'premium_products': Product.objects.filter(is_premium_only=True).count(),
-        'total_orders': Order.objects.count(),
-        'total_reviews': Review.objects.count(),
-        'latest_orders': Order.objects.select_related('user').order_by('-created_at')[:5],
+        "total_users": User.objects.filter(is_superuser=False).count(),
+        "premium_users": premium_user_count,
+        "total_products": Product.objects.count(),
+        "premium_products": Product.objects.filter(is_premium_only=True).count(),
+        "total_orders": Order.objects.count(),
+        "total_reviews": Review.objects.count(),
+        "latest_orders": Order.objects.select_related("user").order_by("-created_at")[:5],
     }
-    return render(request, 'dashboard/admin_dashboard.html', context)
+    return render(request, "dashboard/admin_dashboard.html", context)

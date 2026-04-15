@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/faq/faq.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/faq/faq.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="faq-page stack">
     <section class="content-card">
@@ -111,8 +115,4 @@
         </article>
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/faq/faq.js' %}"></script>
 {% endblock %}

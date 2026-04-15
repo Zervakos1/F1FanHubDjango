@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/cart/cart_detail.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/cart/cart_detail.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="cart-page stack">
     <section class="content-card">
@@ -45,7 +49,7 @@
                         <p class="cart-subtotal">Subtotal: €{{ item.subtotal }}</p>
 
                         <div class="cart-actions-row">
-                            <form method="post" action="/cart/update/{{ item.id }}/" class="quantity-form">
+                            <form method="post" action="{% url 'cart:update-cart-item' item.id %}" class="quantity-form">
                                 {% csrf_token %}
                                 <div class="field-group quantity-group">
                                     <label for="quantity-{{ item.id }}">Quantity</label>
@@ -62,7 +66,7 @@
                                 <button type="submit">Update</button>
                             </form>
 
-                            <form method="post" action="/cart/remove/{{ item.id }}/" class="remove-form">
+                            <form method="post" action="{% url 'cart:remove-cart-item' item.id %}" class="remove-form">
                                 {% csrf_token %}
                                 <button type="submit" class="secondary-button">Remove</button>
                             </form>
@@ -83,8 +87,8 @@
                 </p>
 
                 <div class="summary-actions">
-                    <a href="/catalog/" class="button secondary-button">Continue Shopping</a>
-                    <a href="/cart/checkout/" class="button">Proceed to Checkout</a>
+                    <a href="{% url 'catalog:product-list' %}" class="button secondary-button">Continue Shopping</a>
+                    <a href="{% url 'cart:checkout' %}" class="button">Proceed to Checkout</a>
                 </div>
             </aside>
         </section>
@@ -92,12 +96,8 @@
         <section class="empty-cart content-card">
             <h2>Your cart is empty</h2>
             <p>Add products from the catalogue to start a simulated purchase.</p>
-            <a href="/catalog/" class="button">Browse Catalogue</a>
+            <a href="{% url 'catalog:product-list' %}" class="button">Browse Catalogue</a>
         </section>
     {% endif %}
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/cart/cart_detail.js' %}"></script>
 {% endblock %}

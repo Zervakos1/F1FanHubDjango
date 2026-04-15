@@ -22,11 +22,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('dashboard.urls')),
-    path('accounts/', include('accounts.urls')),
-    path('catalog/', include('catalog.urls')),
-    path('cart/', include('cart.urls')),
-    path('reviews/', include('reviews.urls')),
+    path('', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
+    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('catalog/', include(('catalog.urls', 'catalog'), namespace='catalog')),
+    path('cart/', include(('cart.urls', 'cart'), namespace='cart')),
+    path('reviews/', include(('reviews.urls', 'reviews'), namespace='reviews')),
     path('about/', TemplateView.as_view(template_name='about/about.html'), name='about'),
     path('contact/', TemplateView.as_view(template_name='contact/contact.html'), name='contact'),
     path('faq/', TemplateView.as_view(template_name='faq/faq.html'), name='faq'),

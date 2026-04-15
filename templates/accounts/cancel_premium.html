@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/accounts/cancel_premium.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/accounts/cancel_premium.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="cancel-page">
     <article class="cancel-card content-card">
@@ -22,11 +26,7 @@
             <button type="submit">Confirm Cancellation</button>
         </form>
 
-        <a href="/my-dashboard/" class="button secondary-button">Go Back</a>
+        <a href="{% url 'dashboard:dashboard-router' %}" class="button secondary-button">Go Back</a>
     </article>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/accounts/cancel_premium.js' %}"></script>
 {% endblock %}

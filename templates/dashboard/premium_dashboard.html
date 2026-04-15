@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/dashboard/premium_dashboard.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/dashboard/premium_dashboard.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="dashboard-grid">
     <section class="content-card dashboard-intro">
@@ -16,10 +20,10 @@
         </p>
 
         <div class="dashboard-actions">
-            <a href="/catalog/" class="button">Browse Catalogue</a>
-            <a href="/cart/" class="button">Open Cart</a>
-            <a href="/cart/orders/" class="button">View Orders</a>
-                    </div>
+            <a href="{% url 'catalog:product-list' %}" class="button">Browse Catalogue</a>
+            <a href="{% url 'cart:cart-detail' %}" class="button">Open Cart</a>
+            <a href="{% url 'cart:order-history' %}" class="button">View Orders</a>
+        </div>
     </section>
 
     <section class="content-card">
@@ -41,48 +45,48 @@
             </div>
         {% endif %}
 
-        <a href="/accounts/cancel-premium/" class="button secondary-button">Cancel Premium</a>
+        <a href="{% url 'accounts:cancel-premium' %}" class="button secondary-button">Cancel Premium</a>
     </section>
 
     <section class="content-card vip-rewards-panel">
-    <h2>VIP Rewards</h2>
+        <h2>VIP Rewards</h2>
 
-    <div class="vip-points-grid">
-        <article class="vip-points-box">
-            <h3>Current Points</h3>
-            <p class="vip-points-value">{{ user.profile.premium_points }}</p>
-        </article>
+        <div class="vip-points-grid">
+            <article class="vip-points-box">
+                <h3>Current Points</h3>
+                <p class="vip-points-value">{{ user.profile.premium_points }}</p>
+            </article>
 
-        <article class="vip-points-box">
-            <h3>Lifetime Points</h3>
-            <p class="vip-points-value">{{ user.profile.lifetime_points }}</p>
-        </article>
+            <article class="vip-points-box">
+                <h3>Lifetime Points</h3>
+                <p class="vip-points-value">{{ user.profile.lifetime_points }}</p>
+            </article>
 
-        <article class="vip-points-box">
-            <h3>Total Raffle Entries</h3>
-            <p class="vip-points-value">{{ raffle_entries_count }}</p>
-        </article>
+            <article class="vip-points-box">
+                <h3>Total Raffle Entries</h3>
+                <p class="vip-points-value">{{ raffle_entries_count }}</p>
+            </article>
 
-        <article class="vip-points-box">
-            <h3>Won Raffles</h3>
-            <p class="vip-points-value">{{ won_raffles_count }}</p>
-        </article>
-    </div>
+            <article class="vip-points-box">
+                <h3>Won Raffles</h3>
+                <p class="vip-points-value">{{ won_raffles_count }}</p>
+            </article>
+        </div>
 
-    <div class="vip-actions">
-        <form method="post" action="/accounts/redeem-discount/">
-            {% csrf_token %}
-            <button type="submit">Redeem $10 Discount (200 pts)</button>
-        </form>
+        <div class="vip-actions">
+            <form method="post" action="{% url 'accounts:redeem-discount' %}">
+                {% csrf_token %}
+                <button type="submit">Redeem $10 Discount (200 pts)</button>
+            </form>
 
-        <form method="post" action="/accounts/join-raffle/">
-            {% csrf_token %}
-            <button type="submit">Join Ticket Raffle (100 pts)</button>
-        </form>
-    </div>
-</section>
+            <form method="post" action="{% url 'accounts:join-raffle' %}">
+                {% csrf_token %}
+                <button type="submit">Join Ticket Raffle (100 pts)</button>
+            </form>
+        </div>
+    </section>
 
-<section class="content-card">
+    <section class="content-card">
         <h2>My Rewards Activity</h2>
 
         <h3>Unused Discounts</h3>
@@ -140,7 +144,7 @@
                         </p>
                         <h3>{{ product.name }}</h3>
                         <p>€{{ product.price }}</p>
-                        <a href="/catalog/{{ product.slug }}/" class="button">View Product</a>
+                        <a href="{% url 'catalog:product-detail' product.slug %}" class="button">View Product</a>
                     </article>
                 {% endfor %}
             </div>
@@ -183,7 +187,7 @@
                                 <h3>{{ entry.product.name }}</h3>
                                 <p>{{ entry.viewed_at }}</p>
                             </div>
-                            <a href="/catalog/{{ entry.product.slug }}/" class="button">Open</a>
+                            <a href="{% url 'catalog:product-detail' entry.product.slug %}" class="button">Open</a>
                         </div>
                     </article>
                 {% endfor %}
@@ -193,8 +197,4 @@
         {% endif %}
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/dashboard/premium_dashboard.js' %}"></script>
 {% endblock %}

@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/cart/checkout.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/cart/checkout.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="checkout-page stack">
     <section class="content-card">
@@ -36,7 +40,7 @@
         </div>
 
         <aside class="checkout-summary content-card">
-           <h2>Order Summary</h2>
+            <h2>Order Summary</h2>
 
             <div class="checkout-summary-lines">
                 <p class="summary-line total-line">
@@ -66,12 +70,8 @@
                 <button type="submit">Confirm Simulated Purchase</button>
             </form>
 
-            <a href="/cart/" class="button secondary-button">Back to Cart</a>
+            <a href="{% url 'cart:cart-detail' %}" class="button secondary-button">Back to Cart</a>
         </aside>
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/cart/checkout.js' %}"></script>
 {% endblock %}

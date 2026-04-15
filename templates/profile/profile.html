@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/profile/profile.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/profile/profile.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="profile-page stack">
     <section class="content-card profile-header">
@@ -61,11 +65,12 @@
                 <p>Admin accounts already have full access.</p>
             {% elif user.profile.role == 'premium' %}
                 <p>Your account currently has premium access.</p>
-                <a href="/accounts/cancel-premium/" class="button secondary-button">Cancel Premium</a>
+                <a href="{% url 'accounts:cancel-premium' %}" class="button secondary-button">Cancel Premium</a>
             {% else %}
                 <p>Your account is currently a normal user account.</p>
-                <a href="/accounts/upgrade/" class="button">Upgrade to Premium</a>
+                <a href="{% url 'accounts:upgrade-premium' %}" class="button">Upgrade to Premium</a>
             {% endif %}
+
             {% if user.profile.role == 'premium' %}
                 <article class="summary-box">
                     <p class="summary-label">Premium Points</p>
@@ -110,8 +115,4 @@
         </article>
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/profile/profile.js' %}"></script>
 {% endblock %}

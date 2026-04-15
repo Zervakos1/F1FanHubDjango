@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'css/catalog/product_list.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/catalog/product_list.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <section class="catalogue-page stack">
     <section class="catalogue-hero content-card">
@@ -74,7 +78,7 @@
 
                 <div class="filter-actions">
                     <button type="submit">Apply Filters</button>
-                    <a href="/catalog/" class="button secondary-button">Clear</a>
+                    <a href="{% url 'catalog:product-list' %}" class="button secondary-button">Clear</a>
                 </div>
             </form>
         </aside>
@@ -90,14 +94,15 @@
                     {% for product in products %}
                         <article class="product-card content-card">
                             <div class="product-image-wrap">
-                                    {% if product.image %}
-                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                                    {% elif product.external_image_url %}
-                                        <img src="{{ product.external_image_url }}" alt="{{ product.name }}" class="product-image">
-                                    {% else %}
-                                        <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-image">
-                                    {% endif %}
-                                </div>
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                                {% elif product.external_image_url %}
+                                    <img src="{{ product.external_image_url }}" alt="{{ product.name }}" class="product-image">
+                                {% else %}
+                                    <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-image">
+                                {% endif %}
+                            </div>
+
                             <div class="product-card-top">
                                 <div>
                                     <p class="product-category">
@@ -135,7 +140,7 @@
                                     </p>
                                 </div>
 
-                                <a href="/catalog/{{ product.slug }}/" class="button">View Details</a>
+                                <a href="{% url 'catalog:product-detail' product.slug %}" class="button">View Details</a>
                             </div>
                         </article>
                     {% endfor %}
@@ -144,14 +149,10 @@
                 <div class="empty-state content-card">
                     <h3>No products found</h3>
                     <p>Try changing the search text or clearing the filters.</p>
-                    <a href="/catalog/" class="button">Reset Catalogue</a>
+                    <a href="{% url 'catalog:product-list' %}" class="button">Reset Catalogue</a>
                 </div>
             {% endif %}
         </section>
     </section>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/catalog/product_list.js' %}"></script>
 {% endblock %}
