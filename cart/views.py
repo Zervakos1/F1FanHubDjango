@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
-from accounts.models import DiscountReward
 from catalog.models import Product
 from .models import Cart, CartItem, Order, OrderItem
 
