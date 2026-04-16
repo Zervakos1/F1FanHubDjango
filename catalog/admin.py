@@ -1,10 +1,15 @@
+"""Admin configuration for catalogue models."""
+
 from django.contrib import admin
 from django.utils.html import format_html
+
 from .models import Category, Product, RecentlyViewed, Wishlist
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    """Admin options for categories and subcategories."""
+
     list_display = ["name", "slug", "parent"]
     list_filter = ["parent"]
     search_fields = ["name", "slug"]
@@ -13,6 +18,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    """Admin options for products, including preview images."""
+
     list_display = ["image_preview", "name", "category", "brand", "price", "stock", "is_premium_only"]
     list_filter = ["category", "brand", "is_premium_only"]
     search_fields = ["name", "brand", "description", "slug"]
@@ -20,26 +27,27 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Basic Info", {
-            "fields": ("name", "slug", "category", "description")
+            "fields": ("name", "slug", "category", "description"),
         }),
         ("Product Details", {
-            "fields": ("brand", "color", "size", "price", "stock", "is_premium_only")
+            "fields": ("brand", "color", "size", "price", "stock", "is_premium_only"),
         }),
         ("Images", {
-            "fields": ("image", "external_image_url")
+            "fields": ("image", "external_image_url"),
         }),
     )
 
     def image_preview(self, obj):
+        """Show a small preview for uploaded or external product images."""
         if obj.image:
             return format_html(
                 '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:6px;" />',
-                obj.image.url
+                obj.image.url,
             )
         if obj.external_image_url:
             return format_html(
                 '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:6px;" />',
-                obj.external_image_url
+                obj.external_image_url,
             )
         return "No image"
 
@@ -48,6 +56,8 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(RecentlyViewed)
 class RecentlyViewedAdmin(admin.ModelAdmin):
+    """Admin options for recently viewed product records."""
+
     list_display = ["user", "product", "viewed_at"]
     list_filter = ["viewed_at"]
     search_fields = ["user__username", "product__name"]
@@ -55,6 +65,8 @@ class RecentlyViewedAdmin(admin.ModelAdmin):
 
 @admin.register(Wishlist)
 class WishlistAdmin(admin.ModelAdmin):
+    """Admin options for user wishlists."""
+
     list_display = ["user"]
     search_fields = ["user__username", "user__email"]
     filter_vertical = ["products"]

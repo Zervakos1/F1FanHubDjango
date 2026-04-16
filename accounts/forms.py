@@ -1,9 +1,15 @@
+"""Forms used for registration and profile updates."""
+
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+
 from .models import Profile
 
+
 class RegisterForm(forms.ModelForm):
+    """Custom registration form with password confirmation and extra profile fields."""
+
     password1 = forms.CharField(widget=forms.PasswordInput)
     password2 = forms.CharField(widget=forms.PasswordInput)
     phone = forms.CharField(required=False)
@@ -11,12 +17,13 @@ class RegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ["username", "email"]
 
     def clean(self):
+        """Validate matching passwords and apply Django password validation rules."""
         cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
 
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Passwords do not match.")
@@ -25,14 +32,19 @@ class RegisterForm(forms.ModelForm):
             validate_password(password1)
 
         return cleaned_data
-    
+
+
 class UserUpdateForm(forms.ModelForm):
+    """Form for updating basic user account information."""
+
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ["username", "email"]
 
 
 class ProfileUpdateForm(forms.ModelForm):
+    """Form for updating additional profile information."""
+
     class Meta:
         model = Profile
-        fields = ['phone', 'country']
+        fields = ["phone", "country"]
