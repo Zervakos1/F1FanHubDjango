@@ -1,9 +1,11 @@
 """Management command for creating reusable demo accounts for the project."""
 
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
-from accounts.models import Profile
+from accounts.models import PremiumSubscription, Profile
 from cart.models import Cart
 
 
@@ -20,6 +22,40 @@ class Command(BaseCommand):
         self.create_admin_user()
         self.remove_old_test_user()
         self.stdout.write(self.style.SUCCESS("Demo users created or updated successfully."))
+
+    def ensure_cart(self, user):
+        Cart.objects.get_or_create(user=user)
+
+    def deactivate_all_premium_subscriptions(self, user):
+        user.premium_subscriptions.update(
+            is_active=False,
+            ended_at=None,
+        )
+
+    def ensure_active_premium_subscription(self, user):
+        subscription = user.premium_subscriptions.filter(is_active=True).first()
+
+        if subscription:
+            subscription.plan_name = "Premium Membership"
+            subscription.price = Decimal("15.00")
+            subscription.ended_at = None
+            subscription.save()
+            return
+
+        user.premium_subscriptions.filter(is_active=False).update(
+            plan_name="Premium Membership",
+            price=Decimal("15.00"),
+            is_active=True,
+            ended_at=None,
+        )
+
+        if not user.premium_subscriptions.filter(is_active=True).exists():
+            PremiumSubscription.objects.create(
+                user=user,
+                plan_name="Premium Membership",
+                price=Decimal("15.00"),
+                is_active=True,
+            )
 
     def create_regular_user(self):
         """Create the normal user account."""
@@ -39,7 +75,8 @@ class Command(BaseCommand):
         profile.country = "Cyprus"
         profile.save()
 
-        Cart.objects.get_or_create(user=user)
+        self.deactivate_all_premium_subscriptions(user)
+        self.ensure_cart(user)
 
     def create_premium_user(self):
         """Create the premium user account."""
@@ -59,7 +96,8 @@ class Command(BaseCommand):
         profile.country = "Cyprus"
         profile.save()
 
-        Cart.objects.get_or_create(user=user)
+        self.ensure_active_premium_subscription(user)
+        self.ensure_cart(user)
 
     def create_manager_user(self):
         """Create the manager account with in-site management access only."""
@@ -79,7 +117,8 @@ class Command(BaseCommand):
         profile.country = "Greece"
         profile.save()
 
-        Cart.objects.get_or_create(user=user)
+        self.deactivate_all_premium_subscriptions(user)
+        self.ensure_cart(user)
 
     def create_admin_user(self):
         """Create the real Django superuser account."""
@@ -99,7 +138,8 @@ class Command(BaseCommand):
         profile.country = "Cyprus"
         profile.save()
 
-        Cart.objects.get_or_create(user=user)
+        self.deactivate_all_premium_subscriptions(user)
+        self.ensure_cart(user)
 
     def remove_old_test_user(self):
         """Delete the old test user if it still exists."""

@@ -5,9 +5,10 @@ from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render, redirect
-from django.utils.text import slugify
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.text import slugify
+
 from accounts.models import PremiumSubscription
 from cart.models import Cart, Order
 from catalog.models import Category, Product, Wishlist
@@ -19,6 +20,8 @@ PRODUCT_BRAND_MAX = 20
 PRODUCT_COLOR_MAX = 25
 PRODUCT_SIZE_MAX = 20
 PRODUCT_DESCRIPTION_MAX = 1000
+PRODUCT_IMAGE_URL_MAX = 500
+
 
 def sync_user_premium_role(user):
     """Keep role data aligned with subscriptions without overwriting manager users."""
@@ -64,6 +67,30 @@ def build_unique_product_slug(value, exclude_product_id=None):
         counter += 1
 
     return slug
+
+
+def validate_product_text_lengths(name, slug_value, description, brand, color, size, external_image_url):
+    """Validate product text lengths before saving."""
+    if len(name) > PRODUCT_NAME_MAX:
+        raise ValueError(f"Product name must be at most {PRODUCT_NAME_MAX} characters.")
+
+    if len(slug_value) > PRODUCT_SLUG_MAX:
+        raise ValueError(f"Slug must be at most {PRODUCT_SLUG_MAX} characters.")
+
+    if len(description) > PRODUCT_DESCRIPTION_MAX:
+        raise ValueError(f"Description must be at most {PRODUCT_DESCRIPTION_MAX} characters.")
+
+    if len(brand) > PRODUCT_BRAND_MAX:
+        raise ValueError(f"Brand must be at most {PRODUCT_BRAND_MAX} characters.")
+
+    if len(color) > PRODUCT_COLOR_MAX:
+        raise ValueError(f"Color must be at most {PRODUCT_COLOR_MAX} characters.")
+
+    if len(size) > PRODUCT_SIZE_MAX:
+        raise ValueError(f"Size must be at most {PRODUCT_SIZE_MAX} characters.")
+
+    if len(external_image_url) > PRODUCT_IMAGE_URL_MAX:
+        raise ValueError(f"External image URL must be at most {PRODUCT_IMAGE_URL_MAX} characters.")
 
 
 def public_dashboard(request):
@@ -200,25 +227,6 @@ def premium_dashboard(request):
     return render(request, "dashboard/premium_dashboard.html", context)
 
 
-def validate_product_text_lengths(name, slug_value, description, brand, color, size, external_image_url):
-    if len(name) > PRODUCT_NAME_MAX:
-        raise ValueError(f"Product name must be at most {PRODUCT_NAME_MAX} characters.")
-
-    if len(slug_value) > PRODUCT_SLUG_MAX:
-        raise ValueError(f"Slug must be at most {PRODUCT_SLUG_MAX} characters.")
-
-    if len(description) > PRODUCT_DESCRIPTION_MAX:
-        raise ValueError(f"Description must be at most {PRODUCT_DESCRIPTION_MAX} characters.")
-
-    if len(brand) > PRODUCT_BRAND_MAX:
-        raise ValueError(f"Brand must be at most {PRODUCT_BRAND_MAX} characters.")
-
-    if len(color) > PRODUCT_COLOR_MAX:
-        raise ValueError(f"Color must be at most {PRODUCT_COLOR_MAX} characters.")
-
-    if len(size) > PRODUCT_SIZE_MAX:
-        raise ValueError(f"Size must be at most {PRODUCT_SIZE_MAX} characters.")
-
 @login_required
 def admin_dashboard(request):
     """Render the in-site management dashboard for superusers and managers."""
@@ -240,13 +248,13 @@ def admin_dashboard(request):
                 price = Decimal(request.POST.get("price", "0"))
                 stock = max(0, int(request.POST.get("stock", "0")))
                 external_image_url = request.POST.get("external_image_url", "").strip()
-                is_premium_only = request.POST.get("is_premium_only") == "on"
+                is_premium_only = request.POST.get("is_premium_only", "0") == "1"
 
                 if not name or not description:
                     messages.error(request, "Name and description are required.")
                     return redirect("dashboard:admin-dashboard")
 
-                slug_value = build_unique_product_slug(slug_input or name, exclude_product_id=None)
+                slug_value = build_unique_product_slug(slug_input or name)
 
                 validate_product_text_lengths(
                     name=name,
@@ -255,6 +263,7 @@ def admin_dashboard(request):
                     brand=brand,
                     color=color,
                     size=size,
+                    external_image_url=external_image_url,
                 )
 
                 product = Product.objects.create(
@@ -277,8 +286,8 @@ def admin_dashboard(request):
                     product.save()
 
                 messages.success(request, f"Product '{product.name}' added successfully.")
-            except (InvalidOperation, ValueError):
-                messages.error(request, "Invalid product values provided.")
+            except (InvalidOperation, ValueError) as error:
+                messages.error(request, str(error) or "Invalid product values provided.")
 
             return redirect("dashboard:admin-dashboard")
 
@@ -296,10 +305,8 @@ def admin_dashboard(request):
                 price = Decimal(request.POST.get("price", "0"))
                 stock = max(0, int(request.POST.get("stock", "0")))
                 external_image_url = request.POST.get("external_image_url", "").strip()
-
                 is_premium_only = request.POST.get("is_premium_only", "0") == "1"
                 clear_image = request.POST.get("clear_image", "0") == "1"
-                uploaded_image = request.FILES.get("image")
 
                 if not name or not description:
                     messages.error(request, "Name and description are required.")
@@ -314,10 +321,11 @@ def admin_dashboard(request):
                     brand=brand,
                     color=color,
                     size=size,
+                    external_image_url=external_image_url,
                 )
 
                 product.name = name
-                product.slug = build_unique_product_slug(slug_input or name, exclude_product_id=product.id)
+                product.slug = slug_value
                 product.category = category
                 product.description = description
                 product.brand = brand
@@ -332,6 +340,7 @@ def admin_dashboard(request):
                     product.image.delete(save=False)
                     product.image = None
 
+                uploaded_image = request.FILES.get("image")
                 if uploaded_image:
                     if product.image:
                         product.image.delete(save=False)
