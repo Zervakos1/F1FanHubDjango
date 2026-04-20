@@ -1,3 +1,8 @@
+/* public_dashboard.css
+   Styles the visitor/public homepage.
+   Includes hero actions, next-race widget, featured products, and driver/team carousels.
+*/
+
 .visitor-dashboard {
     max-width: 100%;
     margin: 0 auto;

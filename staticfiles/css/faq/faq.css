@@ -1,3 +1,8 @@
+/* faq.css
+   Styles the FAQ page.
+   Includes FAQ item cards, toggle buttons, and expandable answer sections.
+*/
+
 .faq-page {
     gap: 20px;
 }

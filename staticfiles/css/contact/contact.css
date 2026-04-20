@@ -1,3 +1,9 @@
+/* contact.css
+   Styles the Contact page.
+   Includes the two-column layout, form validation states, social links, map section, and confirmation box.
+*/
+
+
 .contact-page {
     gap: 20px;
 }

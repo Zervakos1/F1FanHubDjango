@@ -1,3 +1,8 @@
+/* profile.css
+   Styles the profile page.
+   Includes account summary cards, membership section, and edit profile form layout.
+*/
+
 .profile-page {
     gap: 20px;
 }

@@ -1,3 +1,8 @@
+/* premium_dashboard.css
+   Styles the premium dashboard.
+   Includes premium status, VIP rewards panel, points grid, premium products, and recent activity sections.
+*/
+
 .dashboard-grid {
     display: grid;
     gap: 20px;

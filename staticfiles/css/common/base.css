@@ -1,3 +1,9 @@
+/* base.css
+   Global site styling.
+   Defines theme variables, light/dark mode, role-based backgrounds,
+   navbar, cards, forms, tables, and shared responsive rules.
+*/
+
 * {
     box-sizing: border-box;
 }
@@ -124,6 +130,18 @@ button {
     appearance: none;
 }
 
+input[type="checkbox"],
+input[type="radio"] {
+    -webkit-appearance: auto;
+    appearance: auto;
+    width: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    accent-color: var(--role-accent);
+    cursor: pointer;
+}
+
 select option {
     background: #1b1b1b;
     color: #ffffff;
@@ -150,7 +168,9 @@ select option {
     flex-wrap: wrap;
 }
 
-.nav-group {
+.nav-group,
+.nav-group-left,
+.nav-group-right {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -185,10 +205,34 @@ select option {
     transform: none;
 }
 
+.button,
+.auth-button,
+.action-link,
+.button-like,
+button:not(.nav-hamburger):not(.nav-dropdown-toggle) {
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: 1px solid var(--role-accent);
+}
+
+.button:hover,
+.auth-button:hover,
+.action-link:hover,
+.button-like:hover,
+button:not(.nav-hamburger):not(.nav-dropdown-toggle):hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+}
+
+.secondary-button {
+    background: transparent;
+    border-color: var(--border);
+}
+
 .nav-button {
     background: var(--button-bg);
     color: var(--button-text);
-    border-color: var(--button-bg);
+    border: 1px solid var(--button-bg);
     cursor: pointer;
 }
 
@@ -239,24 +283,6 @@ select option {
     background: rgba(255, 255, 255, 0.12);
 }
 
-@media (max-width: 980px) {
-    .nav-dropdown {
-        width: 100%;
-    }
-
-    .nav-dropdown-toggle {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .nav-dropdown-menu {
-        position: static;
-        margin-top: 8px;
-        width: 100%;
-        min-width: 0;
-    }
-}
-
 .page-shell {
     max-width: 1180px;
     margin: 0 auto;
@@ -285,28 +311,6 @@ select option {
 .stack {
     display: grid;
     gap: 16px;
-}
-
-.button,
-.auth-button,
-.action-link,
-button {
-    background: var(--button-bg);
-    color: var(--button-text);
-    border: 1px solid var(--role-accent);
-}
-
-.button:hover,
-.auth-button:hover,
-.action-link:hover,
-button:hover {
-    transform: translateY(-1px);
-    opacity: 0.95;
-}
-
-.secondary-button {
-    background: transparent;
-    border-color: var(--border);
 }
 
 input,
@@ -381,6 +385,53 @@ body[data-user-role="admin"] h2 {
     color: #93c5fd;
 }
 
+.site-logo {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.nav-brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.nav-shell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.3rem;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+}
+
+.nav-hamburger span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    margin: 0 auto;
+    border-radius: 999px;
+    background: currentColor;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+
 @media (max-width: 980px) {
     .navbar {
         padding: 14px 16px;
@@ -399,9 +450,68 @@ body[data-user-role="admin"] h2 {
         justify-content: flex-start;
     }
 
+    .nav-dropdown {
+        width: 100%;
+    }
+
+    .nav-dropdown-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nav-dropdown-menu {
+        position: static;
+        margin-top: 8px;
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        display: block;
+    }
+
+    .nav-hamburger {
+        display: flex;
+    }
+
+    .nav-shell {
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .nav-shell.is-open {
+        display: flex;
+    }
+
+    .nav-group-left,
+    .nav-group-right {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
     .nav-link,
+    .nav-button,
+    .nav-dropdown-toggle,
     .theme-toggle {
-        width: auto;
+        width: 100%;
+        text-align: left;
+    }
+
+    .nav-dropdown-menu {
+        display: none;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .nav-dropdown.is-open .nav-dropdown-menu {
+        display: block;
     }
 }
 
@@ -422,7 +532,7 @@ body[data-user-role="admin"] h2 {
 
     .button,
     .action-link,
-    button {
+    button:not(.nav-hamburger):not(.nav-dropdown-toggle) {
         width: 100%;
     }
 }

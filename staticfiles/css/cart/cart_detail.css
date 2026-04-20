@@ -1,3 +1,8 @@
+/* cart_detail.css
+   Styles the shopping cart page.
+   Includes cart item cards, quantity/update controls, summary box, and empty-cart state.
+*/
+
 .cart-page {
     gap: 20px;
 }

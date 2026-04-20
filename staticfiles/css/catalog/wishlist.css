@@ -1,3 +1,8 @@
+/* wishlist.css
+   Styles the wishlist page.
+   Includes wishlist product cards, image blocks, and wishlist action buttons.
+*/
+
 .wishlist-page {
     gap: 20px;
 }

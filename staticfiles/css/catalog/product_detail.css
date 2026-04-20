@@ -1,3 +1,8 @@
+/* product_detail.css
+   Styles the product detail page.
+   Includes product info, action panel, image, reviews section, and related products.
+*/
+
 .product-detail-page {
     display: grid;
     gap: 20px;

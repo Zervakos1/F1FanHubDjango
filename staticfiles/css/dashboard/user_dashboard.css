@@ -1,3 +1,8 @@
+/* user_dashboard.css
+   Styles the regular user dashboard.
+   Includes summary boxes, recent orders, recently viewed products, and dashboard action buttons.
+*/
+
 .dashboard-grid {
     display: grid;
     gap: 20px;

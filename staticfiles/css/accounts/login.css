@@ -1,3 +1,8 @@
+/* login.css
+   Styles the login page.
+   Defines the auth card, form spacing, inputs, buttons, and demo account section.
+*/
+
 .auth-page {
     display: flex;
     justify-content: center;

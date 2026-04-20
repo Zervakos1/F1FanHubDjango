@@ -1,3 +1,8 @@
+/* cancel_premium.css
+   Styles the premium cancellation confirmation page.
+   Centers the cancel card and keeps the form layout simple and readable.
+*/
+
 .cancel-page {
     display: flex;
     justify-content: center;
