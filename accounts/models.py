@@ -5,11 +5,18 @@ from django.db import models
 
 
 class Profile(models.Model):
-    """Extend the default Django user with extra profile and reward data."""
+    """Extend the default Django user with extra profile and reward data.
+
+    Roles:
+    - user: regular registered user
+    - premium: user with active premium features
+    - manager: business operator with in-site management access
+    """
 
     ROLE_CHOICES = [
         ("user", "User"),
         ("premium", "Premium"),
+        ("manager", "Manager"),
     ]
 
     premium_points = models.PositiveIntegerField(default=0)

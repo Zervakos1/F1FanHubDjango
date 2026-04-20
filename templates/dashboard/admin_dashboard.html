@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Management Dashboard{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard/admin_dashboard.css' %}">
@@ -14,13 +14,15 @@
 {% block content %}
 <section class="dashboard-grid">
     <section class="content-card dashboard-intro">
-        <h1 class="page-title">Admin Dashboard</h1>
+        <h1 class="page-title">Management Dashboard</h1>
         <p class="page-subtitle">
-            Monitor the platform, review totals, and open the Django admin panel for full management.
+            This in-site dashboard allows managers to monitor the platform and perform basic catalogue and user-management operations without using the Django root admin panel.
         </p>
 
         <div class="dashboard-actions">
-            <a href="/admin/" class="button">Open Django Admin</a>
+            {% if can_open_django_admin %}
+                <a href="/admin/" class="button">Open Django Admin</a>
+            {% endif %}
             <a href="{% url 'catalog:product-list' %}" class="button">View Catalogue</a>
         </div>
     </section>
@@ -59,6 +61,119 @@
                 <p class="summary-value">{{ total_reviews }}</p>
             </article>
         </div>
+    </section>
+
+    <section class="content-card">
+        <h2>Catalogue Management</h2>
+        <p>Update product price, stock, and premium visibility directly through the site.</p>
+
+        {% if managed_products %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Premium</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in managed_products %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category.name }}</td>
+                                <td>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="update_product">
+                                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                                        <input type="number" step="0.01" name="price" value="{{ product.price }}">
+                                </td>
+                                <td>
+                                        <input type="number" name="stock" min="0" value="{{ product.stock }}">
+                                </td>
+                                <td>
+                                        <input type="checkbox" name="is_premium_only" {% if product.is_premium_only %}checked{% endif %}>
+                                </td>
+                                <td>
+                                        <button type="submit" class="button">Save</button>
+                                    </form>
+
+                                    <form method="post" style="margin-top: 0.5rem;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_product">
+                                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                                        <button type="submit" class="button secondary-button">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No products available yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="content-card">
+        <h2>User Management</h2>
+        <p>Managers can change site roles between normal user and manager. Premium access remains subscription-based.</p>
+
+        {% if managed_users %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Current Role</th>
+                            <th>Premium Access</th>
+                            <th>Update Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for managed_user in managed_users %}
+                            <tr>
+                                <td>{{ managed_user.username }}</td>
+                                <td>{{ managed_user.email }}</td>
+                                <td>{{ managed_user.profile.role|title }}</td>
+                                <td>
+                                    {% if managed_user.premium_subscriptions.all %}
+                                        {% with has_premium=False %}
+                                            {% for sub in managed_user.premium_subscriptions.all %}
+                                                {% if sub.is_active %}Yes{% endif %}
+                                            {% empty %}
+                                                No
+                                            {% endfor %}
+                                        {% endwith %}
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="update_user_role">
+                                        <input type="hidden" name="user_id" value="{{ managed_user.id }}">
+                                        <select name="role">
+                                            <option value="user" {% if managed_user.profile.role == "user" or managed_user.profile.role == "premium" %}selected{% endif %}>User</option>
+                                            <option value="manager" {% if managed_user.profile.role == "manager" %}selected{% endif %}>Manager</option>
+                                        </select>
+                                        <button type="submit" class="button">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No users available yet.</p>
+        {% endif %}
     </section>
 
     <section class="content-card">

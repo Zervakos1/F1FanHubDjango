@@ -1,23 +1,30 @@
-from django.core.management.base import BaseCommand
+"""Management command for creating reusable demo accounts for the project."""
+
 from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+
 from accounts.models import Profile
 from cart.models import Cart
 
 
 class Command(BaseCommand):
+    """Create or refresh the demo users used for presentation and testing."""
+
     help = "Create or refresh demo users for testing"
 
     def handle(self, *args, **kwargs):
+        """Run all demo-user creation helpers in sequence."""
         self.create_regular_user()
         self.create_premium_user()
+        self.create_manager_user()
         self.create_admin_user()
-        self.create_extra_user()
         self.stdout.write(self.style.SUCCESS("Demo users created or updated successfully."))
 
     def create_regular_user(self):
+        """Create the normal user account."""
         user, _ = User.objects.get_or_create(
             username="regularuser",
-            defaults={"email": "regular@example.com"}
+            defaults={"email": "regular@example.com"},
         )
         user.email = "regular@example.com"
         user.set_password("Regular123!")
@@ -34,9 +41,10 @@ class Command(BaseCommand):
         Cart.objects.get_or_create(user=user)
 
     def create_premium_user(self):
+        """Create the premium user account."""
         user, _ = User.objects.get_or_create(
             username="premiumuser",
-            defaults={"email": "premium@example.com"}
+            defaults={"email": "premium@example.com"},
         )
         user.email = "premium@example.com"
         user.set_password("Premium123!")
@@ -52,10 +60,31 @@ class Command(BaseCommand):
 
         Cart.objects.get_or_create(user=user)
 
+    def create_manager_user(self):
+        """Create the manager account with in-site management access only."""
+        user, _ = User.objects.get_or_create(
+            username="manageruser",
+            defaults={"email": "manager@example.com"},
+        )
+        user.email = "manager@example.com"
+        user.set_password("Manager123!")
+        user.is_staff = False
+        user.is_superuser = False
+        user.save()
+
+        profile, _ = Profile.objects.get_or_create(user=user)
+        profile.role = "manager"
+        profile.phone = "4444444444"
+        profile.country = "Greece"
+        profile.save()
+
+        Cart.objects.get_or_create(user=user)
+
     def create_admin_user(self):
+        """Create the real Django superuser account."""
         user, _ = User.objects.get_or_create(
             username="adminuser",
-            defaults={"email": "admin@example.com"}
+            defaults={"email": "admin@example.com"},
         )
         user.email = "admin@example.com"
         user.set_password("Admin123!")
@@ -64,28 +93,9 @@ class Command(BaseCommand):
         user.save()
 
         profile, _ = Profile.objects.get_or_create(user=user)
-        profile.role = "premium"
+        profile.role = "manager"
         profile.phone = "3333333333"
         profile.country = "Cyprus"
-        profile.save()
-
-        Cart.objects.get_or_create(user=user)
-
-    def create_extra_user(self):
-        user, _ = User.objects.get_or_create(
-            username="testuser",
-            defaults={"email": "test@example.com"}
-        )
-        user.email = "test@example.com"
-        user.set_password("Test123!")
-        user.is_staff = False
-        user.is_superuser = False
-        user.save()
-
-        profile, _ = Profile.objects.get_or_create(user=user)
-        profile.role = "user"
-        profile.phone = "4444444444"
-        profile.country = "Greece"
         profile.save()
 
         Cart.objects.get_or_create(user=user)

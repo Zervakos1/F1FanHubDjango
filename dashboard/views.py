@@ -1,6 +1,11 @@
+"""Views for public, user, premium, and management dashboards."""
+
+from decimal import Decimal, InvalidOperation
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 
 from accounts.models import PremiumSubscription
 from cart.models import Cart, Order
@@ -9,21 +14,36 @@ from reviews.models import Review
 
 
 def sync_user_premium_role(user):
-    # Keep the profile role aligned with the active subscription state.
+    """Keep role data aligned with subscriptions without overwriting manager users.
+
+    Managers are special operational accounts and should keep their role even
+    without a premium subscription.
+    """
+    if user.is_superuser:
+        return
+
+    if user.profile.role == "manager":
+        return
+
     has_active_subscription = user.premium_subscriptions.filter(is_active=True).exists()
     user.profile.role = "premium" if has_active_subscription else "user"
     user.profile.save()
 
 
 def user_has_premium_access(user):
-    # Premium access is granted to admins or users with an active premium subscription.
+    """Return True for admins or users with an active premium subscription."""
     if user.is_superuser:
         return True
     return user.premium_subscriptions.filter(is_active=True).exists()
 
 
+def user_has_management_access(user):
+    """Return True for users allowed to access the in-site management dashboard."""
+    return user.is_superuser or getattr(user.profile, "role", "") == "manager"
+
+
 def public_dashboard(request):
-    # Public homepage shown to visitors and non-authenticated users.
+    """Render the public homepage with featured content and placeholder media."""
     featured_products = Product.objects.order_by("?")[:6]
     premium_highlights = Product.objects.filter(is_premium_only=True).order_by("name")[:3]
 
@@ -81,8 +101,8 @@ def public_dashboard(request):
 
 @login_required
 def dashboard_router(request):
-    # Send each user to the correct dashboard by role/subscription.
-    if request.user.is_superuser:
+    """Send users to the correct dashboard based on access level."""
+    if user_has_management_access(request.user):
         return redirect("dashboard:admin-dashboard")
 
     sync_user_premium_role(request.user)
@@ -95,6 +115,7 @@ def dashboard_router(request):
 
 @login_required
 def user_dashboard(request):
+    """Render the normal user dashboard."""
     cart, _ = Cart.objects.get_or_create(user=request.user)
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
 
@@ -116,7 +137,8 @@ def user_dashboard(request):
 
 @login_required
 def premium_dashboard(request):
-    if request.user.is_superuser:
+    """Render the premium member dashboard."""
+    if user_has_management_access(request.user):
         return redirect("dashboard:admin-dashboard")
 
     sync_user_premium_role(request.user)
@@ -156,8 +178,55 @@ def premium_dashboard(request):
 
 @login_required
 def admin_dashboard(request):
-    if not request.user.is_superuser:
+    """Render the in-site management dashboard for superusers and managers.
+
+    Supported management actions:
+    - update simple product fields through the site
+    - delete products
+    - change user site role between user and manager
+    """
+    if not user_has_management_access(request.user):
         return redirect("dashboard:dashboard-router")
+
+    if request.method == "POST":
+        action = request.POST.get("action", "").strip()
+
+        if action == "update_product":
+            product = get_object_or_404(Product, id=request.POST.get("product_id"))
+            try:
+                product.price = Decimal(request.POST.get("price", "0"))
+                product.stock = max(0, int(request.POST.get("stock", "0")))
+                product.is_premium_only = request.POST.get("is_premium_only") == "on"
+                product.save()
+                messages.success(request, f"Product '{product.name}' updated successfully.")
+            except (InvalidOperation, ValueError):
+                messages.error(request, "Invalid product values provided.")
+
+            return redirect("dashboard:admin-dashboard")
+
+        if action == "delete_product":
+            product = get_object_or_404(Product, id=request.POST.get("product_id"))
+            product_name = product.name
+            product.delete()
+            messages.success(request, f"Product '{product_name}' deleted successfully.")
+            return redirect("dashboard:admin-dashboard")
+
+        if action == "update_user_role":
+            managed_user = get_object_or_404(User.objects.select_related("profile"), id=request.POST.get("user_id"))
+
+            if managed_user.is_superuser:
+                messages.error(request, "Superuser access cannot be changed from this page.")
+                return redirect("dashboard:admin-dashboard")
+
+            new_role = request.POST.get("role", "user")
+            if new_role not in {"user", "manager"}:
+                messages.error(request, "Invalid role selected.")
+                return redirect("dashboard:admin-dashboard")
+
+            managed_user.profile.role = new_role
+            managed_user.profile.save()
+            messages.success(request, f"Role for '{managed_user.username}' updated to {new_role}.")
+            return redirect("dashboard:admin-dashboard")
 
     premium_user_count = (
         PremiumSubscription.objects.filter(is_active=True)
@@ -165,6 +234,15 @@ def admin_dashboard(request):
         .distinct()
         .count()
     )
+
+    managed_users = (
+        User.objects.select_related("profile")
+        .prefetch_related("premium_subscriptions")
+        .filter(is_superuser=False)
+        .order_by("username")[:10]
+    )
+
+    managed_products = Product.objects.select_related("category").order_by("name")[:10]
 
     context = {
         "total_users": User.objects.filter(is_superuser=False).count(),
@@ -174,5 +252,8 @@ def admin_dashboard(request):
         "total_orders": Order.objects.count(),
         "total_reviews": Review.objects.count(),
         "latest_orders": Order.objects.select_related("user").order_by("-created_at")[:5],
+        "managed_users": managed_users,
+        "managed_products": managed_products,
+        "can_open_django_admin": request.user.is_superuser,
     }
     return render(request, "dashboard/admin_dashboard.html", context)
