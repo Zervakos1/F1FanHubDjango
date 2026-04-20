@@ -7,7 +7,7 @@
 const qs = (selector, scope = document) => scope.querySelector(selector);
 const qsa = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 
-const MOBILE_BREAKPOINT = 900;
+const MOBILE_BREAKPOINT = 1100;
 
 const getRoot = () => document.documentElement;
 const getThemeToggle = () => qs("[data-theme-toggle]");
