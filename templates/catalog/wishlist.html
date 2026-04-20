@@ -22,7 +22,7 @@
         <div class="wishlist-grid">
             {% for product in wishlist_products %}
                 <article class="wishlist-card content-card">
-                    <div class="wishlist-image-wrap">
+                    <a href="{% url 'catalog:product-detail' product.slug %}" class="wishlist-image-wrap">
                         {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="wishlist-image">
                         {% elif product.external_image_url %}
@@ -30,7 +30,7 @@
                         {% else %}
                             <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="wishlist-image">
                         {% endif %}
-                    </div>
+                    </a>
 
                     <p class="wishlist-category">
                         {% if product.category.parent %}

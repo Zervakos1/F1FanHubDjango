@@ -93,7 +93,7 @@
                 <div class="product-grid">
                     {% for product in products %}
                         <article class="product-card content-card">
-                            <div class="product-image-wrap">
+                            <a href="{% url 'catalog:product-detail' product.slug %}" class="product-image-wrap">
                                 {% if product.image %}
                                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
                                 {% elif product.external_image_url %}
@@ -101,7 +101,7 @@
                                 {% else %}
                                     <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-image">
                                 {% endif %}
-                            </div>
+                            </a>
 
                             <div class="product-card-top">
                                 <div>

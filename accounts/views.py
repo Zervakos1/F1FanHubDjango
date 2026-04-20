@@ -11,16 +11,27 @@ from .models import PremiumSubscription, DiscountReward, RaffleEntry
 
 
 def sync_user_premium_role(user):
-    # Keep the profile role aligned with the active subscription state.
+    # Keep the profile role aligned with the active subscription state,
+    # but never overwrite manager users.
+    if user.is_superuser:
+        return
+
+    if getattr(user.profile, "role", "") == "manager":
+        return
+
     has_active_subscription = user.premium_subscriptions.filter(is_active=True).exists()
     user.profile.role = "premium" if has_active_subscription else "user"
     user.profile.save()
 
 
 def user_has_premium_access(user):
-    # Premium access is granted to admins or users with an active premium subscription.
+    # Premium access is granted to admins, managers, or users with an active premium subscription.
     if user.is_superuser:
         return True
+
+    if getattr(user.profile, "role", "") == "manager":
+        return True
+
     return user.premium_subscriptions.filter(is_active=True).exists()
 
 

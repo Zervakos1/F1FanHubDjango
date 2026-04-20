@@ -6,6 +6,19 @@ from reviews.models import Review
 from .models import Product, Category, RecentlyViewed, Wishlist
 
 
+def user_has_premium_access(user):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_superuser:
+        return True
+
+    if getattr(user.profile, "role", "") == "manager":
+        return True
+
+    return user.premium_subscriptions.filter(is_active=True).exists()
+
+
 def product_list(request):
     # Product catalogue with search and filter support.
     products = Product.objects.select_related("category", "category__parent").all().order_by("name")
@@ -68,10 +81,7 @@ def product_detail(request, slug):
     is_in_wishlist = False
 
     if request.user.is_authenticated:
-        has_premium_access = (
-            request.user.is_superuser
-            or request.user.premium_subscriptions.filter(is_active=True).exists()
-        )
+        has_premium_access = user_has_premium_access(request.user)
 
         RecentlyViewed.objects.update_or_create(
             user=request.user,

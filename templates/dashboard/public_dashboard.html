@@ -90,7 +90,7 @@
         <div class="featured-grid">
             {% for product in featured_products %}
                 <article class="featured-card">
-                    <div class="featured-image-wrap">
+                    <a href="{% url 'catalog:product-detail' product.slug %}" class="featured-image-wrap">
                         {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="featured-image">
                         {% elif product.external_image_url %}
@@ -98,7 +98,7 @@
                         {% else %}
                             <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="featured-image">
                         {% endif %}
-                    </div>
+                    </a>
 
                     <p class="featured-category">
                         {% if product.category.parent %}
@@ -126,7 +126,7 @@
         <div class="featured-grid premium-grid-home">
             {% for product in premium_highlights %}
                 <article class="featured-card">
-                    <div class="featured-image-wrap">
+                    <a href="{% url 'catalog:product-detail' product.slug %}" class="featured-image-wrap">
                         {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="featured-image">
                         {% elif product.external_image_url %}
@@ -134,7 +134,7 @@
                         {% else %}
                             <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="featured-image">
                         {% endif %}
-                    </div>
+                    </a>
 
                     <p class="featured-category">Premium</p>
                     <h3>{{ product.name }}</h3>

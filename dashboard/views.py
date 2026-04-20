@@ -6,19 +6,22 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-
+from django.utils.text import slugify
+from django.utils import timezone
 from accounts.models import PremiumSubscription
 from cart.models import Cart, Order
-from catalog.models import Product, Wishlist
+from catalog.models import Category, Product, Wishlist
 from reviews.models import Review
 
+PRODUCT_NAME_MAX = 30
+PRODUCT_SLUG_MAX = 35
+PRODUCT_BRAND_MAX = 20
+PRODUCT_COLOR_MAX = 25
+PRODUCT_SIZE_MAX = 20
+PRODUCT_DESCRIPTION_MAX = 1000
 
 def sync_user_premium_role(user):
-    """Keep role data aligned with subscriptions without overwriting manager users.
-
-    Managers are special operational accounts and should keep their role even
-    without a premium subscription.
-    """
+    """Keep role data aligned with subscriptions without overwriting manager users."""
     if user.is_superuser:
         return
 
@@ -31,15 +34,36 @@ def sync_user_premium_role(user):
 
 
 def user_has_premium_access(user):
-    """Return True for admins or users with an active premium subscription."""
+    """Return True for admins, managers, or users with an active premium subscription."""
     if user.is_superuser:
         return True
+
+    if getattr(user.profile, "role", "") == "manager":
+        return True
+
     return user.premium_subscriptions.filter(is_active=True).exists()
 
 
 def user_has_management_access(user):
     """Return True for users allowed to access the in-site management dashboard."""
     return user.is_superuser or getattr(user.profile, "role", "") == "manager"
+
+
+def build_unique_product_slug(value, exclude_product_id=None):
+    """Create a unique slug for a product, optionally excluding the current product."""
+    base_slug = slugify(value).strip("-") or "product"
+    slug = base_slug
+    counter = 2
+
+    existing_products = Product.objects.all()
+    if exclude_product_id is not None:
+        existing_products = existing_products.exclude(id=exclude_product_id)
+
+    while existing_products.filter(slug=slug).exists():
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+    return slug
 
 
 def public_dashboard(request):
@@ -176,31 +200,147 @@ def premium_dashboard(request):
     return render(request, "dashboard/premium_dashboard.html", context)
 
 
+def validate_product_text_lengths(name, slug_value, description, brand, color, size, external_image_url):
+    if len(name) > PRODUCT_NAME_MAX:
+        raise ValueError(f"Product name must be at most {PRODUCT_NAME_MAX} characters.")
+
+    if len(slug_value) > PRODUCT_SLUG_MAX:
+        raise ValueError(f"Slug must be at most {PRODUCT_SLUG_MAX} characters.")
+
+    if len(description) > PRODUCT_DESCRIPTION_MAX:
+        raise ValueError(f"Description must be at most {PRODUCT_DESCRIPTION_MAX} characters.")
+
+    if len(brand) > PRODUCT_BRAND_MAX:
+        raise ValueError(f"Brand must be at most {PRODUCT_BRAND_MAX} characters.")
+
+    if len(color) > PRODUCT_COLOR_MAX:
+        raise ValueError(f"Color must be at most {PRODUCT_COLOR_MAX} characters.")
+
+    if len(size) > PRODUCT_SIZE_MAX:
+        raise ValueError(f"Size must be at most {PRODUCT_SIZE_MAX} characters.")
+
 @login_required
 def admin_dashboard(request):
-    """Render the in-site management dashboard for superusers and managers.
-
-    Supported management actions:
-    - update simple product fields through the site
-    - delete products
-    - change user site role between user and manager
-    """
+    """Render the in-site management dashboard for superusers and managers."""
     if not user_has_management_access(request.user):
         return redirect("dashboard:dashboard-router")
 
     if request.method == "POST":
         action = request.POST.get("action", "").strip()
 
-        if action == "update_product":
-            product = get_object_or_404(Product, id=request.POST.get("product_id"))
+        if action == "add_product":
             try:
-                product.price = Decimal(request.POST.get("price", "0"))
-                product.stock = max(0, int(request.POST.get("stock", "0")))
-                product.is_premium_only = request.POST.get("is_premium_only") == "on"
-                product.save()
-                messages.success(request, f"Product '{product.name}' updated successfully.")
+                name = request.POST.get("name", "").strip()
+                slug_input = request.POST.get("slug", "").strip()
+                description = request.POST.get("description", "").strip()
+                category = get_object_or_404(Category, id=request.POST.get("category_id"))
+                brand = request.POST.get("brand", "").strip()
+                color = request.POST.get("color", "").strip()
+                size = request.POST.get("size", "").strip()
+                price = Decimal(request.POST.get("price", "0"))
+                stock = max(0, int(request.POST.get("stock", "0")))
+                external_image_url = request.POST.get("external_image_url", "").strip()
+                is_premium_only = request.POST.get("is_premium_only") == "on"
+
+                if not name or not description:
+                    messages.error(request, "Name and description are required.")
+                    return redirect("dashboard:admin-dashboard")
+
+                slug_value = build_unique_product_slug(slug_input or name, exclude_product_id=None)
+
+                validate_product_text_lengths(
+                    name=name,
+                    slug_value=slug_value,
+                    description=description,
+                    brand=brand,
+                    color=color,
+                    size=size,
+                )
+
+                product = Product.objects.create(
+                    category=category,
+                    name=name,
+                    slug=slug_value,
+                    description=description,
+                    brand=brand,
+                    color=color,
+                    size=size,
+                    price=price,
+                    stock=stock,
+                    is_premium_only=is_premium_only,
+                    external_image_url=external_image_url,
+                )
+
+                uploaded_image = request.FILES.get("image")
+                if uploaded_image:
+                    product.image = uploaded_image
+                    product.save()
+
+                messages.success(request, f"Product '{product.name}' added successfully.")
             except (InvalidOperation, ValueError):
                 messages.error(request, "Invalid product values provided.")
+
+            return redirect("dashboard:admin-dashboard")
+
+        if action == "update_product":
+            product = get_object_or_404(Product, id=request.POST.get("product_id"))
+
+            try:
+                name = request.POST.get("name", "").strip()
+                slug_input = request.POST.get("slug", "").strip()
+                description = request.POST.get("description", "").strip()
+                category = get_object_or_404(Category, id=request.POST.get("category_id"))
+                brand = request.POST.get("brand", "").strip()
+                color = request.POST.get("color", "").strip()
+                size = request.POST.get("size", "").strip()
+                price = Decimal(request.POST.get("price", "0"))
+                stock = max(0, int(request.POST.get("stock", "0")))
+                external_image_url = request.POST.get("external_image_url", "").strip()
+
+                is_premium_only = request.POST.get("is_premium_only", "0") == "1"
+                clear_image = request.POST.get("clear_image", "0") == "1"
+                uploaded_image = request.FILES.get("image")
+
+                if not name or not description:
+                    messages.error(request, "Name and description are required.")
+                    return redirect("dashboard:admin-dashboard")
+
+                slug_value = build_unique_product_slug(slug_input or name, exclude_product_id=product.id)
+
+                validate_product_text_lengths(
+                    name=name,
+                    slug_value=slug_value,
+                    description=description,
+                    brand=brand,
+                    color=color,
+                    size=size,
+                )
+
+                product.name = name
+                product.slug = build_unique_product_slug(slug_input or name, exclude_product_id=product.id)
+                product.category = category
+                product.description = description
+                product.brand = brand
+                product.color = color
+                product.size = size
+                product.price = price
+                product.stock = stock
+                product.external_image_url = external_image_url
+                product.is_premium_only = is_premium_only
+
+                if clear_image and product.image:
+                    product.image.delete(save=False)
+                    product.image = None
+
+                if uploaded_image:
+                    if product.image:
+                        product.image.delete(save=False)
+                    product.image = uploaded_image
+
+                product.save()
+                messages.success(request, f"Product '{product.name}' updated successfully.")
+            except (InvalidOperation, ValueError) as error:
+                messages.error(request, str(error) or "Invalid product values provided.")
 
             return redirect("dashboard:admin-dashboard")
 
@@ -211,21 +351,77 @@ def admin_dashboard(request):
             messages.success(request, f"Product '{product_name}' deleted successfully.")
             return redirect("dashboard:admin-dashboard")
 
-        if action == "update_user_role":
-            managed_user = get_object_or_404(User.objects.select_related("profile"), id=request.POST.get("user_id"))
+        if action == "change_user_role":
+            managed_user = get_object_or_404(
+                User.objects.select_related("profile"),
+                id=request.POST.get("user_id"),
+            )
+            new_role = request.POST.get("role", "").strip()
 
-            if managed_user.is_superuser:
-                messages.error(request, "Superuser access cannot be changed from this page.")
+            valid_roles = {choice[0] for choice in managed_user.profile.ROLE_CHOICES}
+
+            if managed_user == request.user:
+                messages.error(request, "You cannot change your own role from the management dashboard.")
                 return redirect("dashboard:admin-dashboard")
 
-            new_role = request.POST.get("role", "user")
-            if new_role not in {"user", "manager"}:
+            if managed_user.is_superuser:
+                messages.error(request, "Superuser roles cannot be changed from this page.")
+                return redirect("dashboard:admin-dashboard")
+
+            if new_role not in valid_roles:
                 messages.error(request, "Invalid role selected.")
                 return redirect("dashboard:admin-dashboard")
 
-            managed_user.profile.role = new_role
+            if new_role == "premium":
+                has_active_subscription = managed_user.premium_subscriptions.filter(is_active=True).exists()
+                if not has_active_subscription:
+                    PremiumSubscription.objects.create(
+                        user=managed_user,
+                        plan_name="Premium Membership",
+                        price=15.00,
+                        is_active=True,
+                    )
+                managed_user.profile.role = "premium"
+
+            elif new_role == "user":
+                managed_user.premium_subscriptions.filter(is_active=True).update(
+                    is_active=False,
+                    ended_at=timezone.now(),
+                )
+                managed_user.profile.role = "user"
+
+            elif new_role == "manager":
+                managed_user.premium_subscriptions.filter(is_active=True).update(
+                    is_active=False,
+                    ended_at=timezone.now(),
+                )
+                managed_user.profile.role = "manager"
+
             managed_user.profile.save()
             messages.success(request, f"Role for '{managed_user.username}' updated to {new_role}.")
+            return redirect("dashboard:admin-dashboard")
+
+        if action == "delete_user":
+            managed_user = get_object_or_404(User.objects.select_related("profile"), id=request.POST.get("user_id"))
+
+            if managed_user == request.user:
+                messages.error(request, "You cannot delete your own account from the management dashboard.")
+                return redirect("dashboard:admin-dashboard")
+
+            if managed_user.is_superuser:
+                messages.error(request, "Superuser accounts cannot be deleted from this page.")
+                return redirect("dashboard:admin-dashboard")
+
+            username = managed_user.username
+            managed_user.delete()
+            messages.success(request, f"User '{username}' deleted successfully.")
+            return redirect("dashboard:admin-dashboard")
+
+        if action == "delete_order":
+            order = get_object_or_404(Order, id=request.POST.get("order_id"))
+            order_id = order.id
+            order.delete()
+            messages.success(request, f"Order #{order_id} deleted successfully.")
             return redirect("dashboard:admin-dashboard")
 
     premium_user_count = (
@@ -237,12 +433,13 @@ def admin_dashboard(request):
 
     managed_users = (
         User.objects.select_related("profile")
-        .prefetch_related("premium_subscriptions")
         .filter(is_superuser=False)
-        .order_by("username")[:10]
+        .order_by("username")
     )
 
-    managed_products = Product.objects.select_related("category").order_by("name")[:10]
+    managed_products = Product.objects.select_related("category", "category__parent").order_by("name")
+    all_orders = Order.objects.select_related("user").prefetch_related("items__product").order_by("-created_at")
+    categories = Category.objects.select_related("parent").order_by("name")
 
     context = {
         "total_users": User.objects.filter(is_superuser=False).count(),
@@ -251,9 +448,11 @@ def admin_dashboard(request):
         "premium_products": Product.objects.filter(is_premium_only=True).count(),
         "total_orders": Order.objects.count(),
         "total_reviews": Review.objects.count(),
-        "latest_orders": Order.objects.select_related("user").order_by("-created_at")[:5],
+        "latest_orders": all_orders[:5],
+        "all_orders": all_orders,
         "managed_users": managed_users,
         "managed_products": managed_products,
+        "categories": categories,
         "can_open_django_admin": request.user.is_superuser,
     }
     return render(request, "dashboard/admin_dashboard.html", context)

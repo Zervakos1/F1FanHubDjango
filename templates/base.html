@@ -19,10 +19,26 @@
     {% block extra_js %}{% endblock %}
     
 </head>
-<body data-user-role="{% if not user.is_authenticated %}visitor{% elif user.is_superuser %}admin{% else %}{{ user.profile.role }}{% endif %}">
+<body data-user-role="{% if not user.is_authenticated %}visitor{% elif user.is_superuser or user.profile.role == 'manager' %}admin{% else %}{{ user.profile.role }}{% endif %}">
     <header class="site-header">
-        <nav class="navbar">
-            <div class="nav-group">
+    <nav class="navbar">
+        <div class="nav-brand-row">
+            <a href="{% url 'dashboard:public-dashboard' %}" class="site-logo">F1 Fan Hub</a>
+
+            <button
+                type="button"
+                class="nav-hamburger"
+                data-nav-toggle
+                aria-label="Toggle navigation"
+                aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="nav-shell" data-nav-menu>
+            <div class="nav-group nav-group-left">
                 <a href="{% url 'dashboard:public-dashboard' %}"
                    class="nav-link {% if request.resolver_match.view_name == 'dashboard:public-dashboard' %}nav-link-active{% endif %}">
                     Home
@@ -111,8 +127,9 @@
                     </a>
                 {% endif %}
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
 
     <main class="page-shell">
         {% if messages %}

@@ -135,6 +135,16 @@
             <div class="premium-grid">
                 {% for product in premium_products %}
                     <article class="premium-card">
+                        <a href="{% url 'catalog:product-detail' product.slug %}" class="premium-image-wrap">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="premium-image">
+                            {% elif product.external_image_url %}
+                                <img src="{{ product.external_image_url }}" alt="{{ product.name }}" class="premium-image">
+                            {% else %}
+                                <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="premium-image">
+                            {% endif %}
+                        </a>
+
                         <p class="premium-category">
                             {% if product.category.parent %}
                                 {{ product.category.parent.name }} / {{ product.category.name }}
@@ -142,6 +152,7 @@
                                 {{ product.category.name }}
                             {% endif %}
                         </p>
+
                         <h3>{{ product.name }}</h3>
                         <p>€{{ product.price }}</p>
                         <a href="{% url 'catalog:product-detail' product.slug %}" class="button">View Product</a>

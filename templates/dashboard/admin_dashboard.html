@@ -16,7 +16,7 @@
     <section class="content-card dashboard-intro">
         <h1 class="page-title">Management Dashboard</h1>
         <p class="page-subtitle">
-            This in-site dashboard allows managers to monitor the platform and perform basic catalogue and user-management operations without using the Django root admin panel.
+            Managers can create products, fully edit products, manage user roles, and review orders from one page.
         </p>
 
         <div class="dashboard-actions">
@@ -64,55 +64,229 @@
     </section>
 
     <section class="content-card">
-        <h2>Catalogue Management</h2>
-        <p>Update product price, stock, and premium visibility directly through the site.</p>
+        <h2>Add Product Through the Site</h2>
+
+        <form method="post" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_product">
+
+            <div class="manager-product-grid">
+                <div class="field-group">
+                    <label for="name">Product Name</label>
+                    <input type="text" name="name" id="name" required maxlength="30">
+                </div>
+
+                <div class="field-group">
+                    <label for="slug">Slug (optional)</label>
+                    <input type="text" name="slug" id="slug" maxlength="35">
+                </div>
+
+                <div class="field-group">
+                    <label for="category_id">Category</label>
+                    <select name="category_id" id="category_id" required>
+                        <option value="">Select category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">
+                                {% if category.parent %}{{ category.parent.name }} / {% endif %}{{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="brand">Brand</label>
+                    <input type="text" name="brand" id="brand" maxlength="20">
+                </div>
+
+                <div class="field-group">
+                    <label for="color">Color</label>
+                    <input type="text" name="color" id="color" maxlength="25">
+                </div>
+
+                <div class="field-group">
+                    <label for="size">Size</label>
+                    <input type="text" name="size" id="size" maxlength="20">
+                </div>
+
+                <div class="field-group">
+                    <label for="price">Price</label>
+                    <input type="number" step="0.01" name="price" id="price" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" name="stock" id="stock" min="0" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="external_image_url">External Image URL</label>
+                    <input type="url" name="external_image_url" id="external_image_url">
+                </div>
+
+                <div class="field-group">
+                    <label for="image">Upload Image</label>
+                    <input type="file" name="image" id="image">
+                </div>
+
+                <div class="field-group checkbox-field">
+                    <input type="hidden" name="is_premium_only" value="0">
+                    <label>
+                        <input type="checkbox" name="is_premium_only" value="1">
+                        <span>Premium Only</span>
+                    </label>
+                </div>
+
+                <div class="field-group full-width">
+                    <label for="description">Description</label>
+                    <textarea name="description" id="description" rows="5" maxlength="1000" required></textarea>
+                </div>
+            </div>
+
+            <div class="inline-actions">
+                <button type="submit" class="button">Add Product</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="content-card">
+        <h2>All Products</h2>
 
         {% if managed_products %}
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Premium</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for product in managed_products %}
-                            <tr>
-                                <td>{{ product.name }}</td>
-                                <td>{{ product.category.name }}</td>
-                                <td>
-                                    <form method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="update_product">
-                                        <input type="hidden" name="product_id" value="{{ product.id }}">
-                                        <input type="number" step="0.01" name="price" value="{{ product.price }}">
-                                </td>
-                                <td>
-                                        <input type="number" name="stock" min="0" value="{{ product.stock }}">
-                                </td>
-                                <td>
-                                        <input type="checkbox" name="is_premium_only" {% if product.is_premium_only %}checked{% endif %}>
-                                </td>
-                                <td>
-                                        <button type="submit" class="button">Save</button>
-                                    </form>
+            <div class="dashboard-scroll-area">
+                <div class="manager-stack">
+                    {% for product in managed_products %}
+                        <details class="manager-product-card">
+                            <summary class="manager-product-summary">
+                                <span class="summary-name">{{ product.name }}</span>
 
-                                    <form method="post" style="margin-top: 0.5rem;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="delete_product">
-                                        <input type="hidden" name="product_id" value="{{ product.id }}">
-                                        <button type="submit" class="button secondary-button">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                <span class="summary-category">
+                                    {% if product.category.parent %}
+                                        {{ product.category.parent.name }} / {{ product.category.name }}
+                                    {% else %}
+                                        {{ product.category.name }}
+                                    {% endif %}
+                                </span>
+
+                                <span class="summary-premium {% if product.is_premium_only %}is-premium{% else %}is-regular{% endif %}">
+                                    {% if product.is_premium_only %}Premium{% else %}Regular{% endif %}
+                                </span>
+                            </summary>
+
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update_product">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                                <div class="manager-product-grid">
+                                    <div class="field-group">
+                                        <label>Name</label>
+                                        <input type="text" name="name" value="{{ product.name }}" maxlength="30" required>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Slug</label>
+                                        <input type="text" name="slug" value="{{ product.slug }}" maxlength="35">
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Category</label>
+                                        <select name="category_id" required>
+                                            {% for category in categories %}
+                                                <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>
+                                                    {% if category.parent %}{{ category.parent.name }} / {% endif %}{{ category.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Brand</label>
+                                        <input type="text" name="brand" value="{{ product.brand }}" maxlength="20">
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Color</label>
+                                        <input type="text" name="color" value="{{ product.color }}" maxlength="25">
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Size</label>
+                                        <input type="text" name="size" value="{{ product.size }}" maxlength="20">
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Price</label>
+                                        <input type="number" step="0.01" name="price" value="{{ product.price }}" required>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Stock</label>
+                                        <input type="number" name="stock" min="0" value="{{ product.stock }}" required>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>External Image URL</label>
+                                        <input type="url" name="external_image_url" value="{{ product.external_image_url }}">
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Upload New Image</label>
+                                        <input type="file" name="image">
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label>Current Image</label>
+                                        <div>
+                                            {% if product.image %}
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="manager-image-preview">
+                                            {% elif product.external_image_url %}
+                                                <img src="{{ product.external_image_url }}" alt="{{ product.name }}" class="manager-image-preview">
+                                            {% else %}
+                                                <p>No image</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="field-group checkbox-field">
+                                        <input type="hidden" name="clear_image" value="0">
+                                        <label>
+                                            <input type="checkbox" name="clear_image" value="1">
+                                            <span>Clear uploaded image</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="field-group checkbox-field">
+                                        <input type="hidden" name="is_premium_only" value="0">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="is_premium_only"
+                                                value="1"
+                                                {% if product.is_premium_only %}checked{% endif %}>
+                                            <span>Premium Only</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="field-group full-width">
+                                        <label>Description</label>
+                                        <textarea name="description" rows="5" maxlength="1000" required>{{ product.description }}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="inline-actions">
+                                    <button type="submit" class="button">Save Changes</button>
+                                </div>
+                            </form>
+
+                            <form method="post" class="delete-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_product">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="button secondary-button">Delete Product</button>
+                            </form>
+                        </details>
+                    {% endfor %}
+                </div>
             </div>
         {% else %}
             <p>No products available yet.</p>
@@ -120,19 +294,18 @@
     </section>
 
     <section class="content-card">
-        <h2>User Management</h2>
-        <p>Managers can change site roles between normal user and manager. Premium access remains subscription-based.</p>
+        <h2>Users</h2>
 
         {% if managed_users %}
-            <div class="table-wrap">
+            <div class="user-table-scroll table-wrap sticky-table">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Username</th>
                             <th>Email</th>
                             <th>Current Role</th>
-                            <th>Premium Access</th>
-                            <th>Update Role</th>
+                            <th>Change Role</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -142,28 +315,26 @@
                                 <td>{{ managed_user.email }}</td>
                                 <td>{{ managed_user.profile.role|title }}</td>
                                 <td>
-                                    {% if managed_user.premium_subscriptions.all %}
-                                        {% with has_premium=False %}
-                                            {% for sub in managed_user.premium_subscriptions.all %}
-                                                {% if sub.is_active %}Yes{% endif %}
-                                            {% empty %}
-                                                No
-                                            {% endfor %}
-                                        {% endwith %}
-                                    {% else %}
-                                        No
-                                    {% endif %}
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="change_user_role">
+                                        <input type="hidden" name="user_id" value="{{ managed_user.id }}">
+
+                                        <select name="role">
+                                            <option value="user" {% if managed_user.profile.role == 'user' %}selected{% endif %}>User</option>
+                                            <option value="premium" {% if managed_user.profile.role == 'premium' %}selected{% endif %}>Premium</option>
+                                            <option value="manager" {% if managed_user.profile.role == 'manager' %}selected{% endif %}>Manager</option>
+                                        </select>
+
+                                        <button type="submit" class="button small-top-space">Save Role</button>
+                                    </form>
                                 </td>
                                 <td>
                                     <form method="post">
                                         {% csrf_token %}
-                                        <input type="hidden" name="action" value="update_user_role">
+                                        <input type="hidden" name="action" value="delete_user">
                                         <input type="hidden" name="user_id" value="{{ managed_user.id }}">
-                                        <select name="role">
-                                            <option value="user" {% if managed_user.profile.role == "user" or managed_user.profile.role == "premium" %}selected{% endif %}>User</option>
-                                            <option value="manager" {% if managed_user.profile.role == "manager" %}selected{% endif %}>Manager</option>
-                                        </select>
-                                        <button type="submit" class="button">Save</button>
+                                        <button type="submit" class="button secondary-button">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -177,32 +348,55 @@
     </section>
 
     <section class="content-card">
-        <h2>Latest Orders</h2>
+        <h2>Orders</h2>
 
-        {% if latest_orders %}
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Order</th>
-                            <th>User</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in latest_orders %}
-                            <tr>
-                                <td>#{{ order.id }}</td>
-                                <td>{{ order.user.username }}</td>
-                                <td>{{ order.status }}</td>
-                                <td>€{{ order.total_amount }}</td>
-                                <td>{{ order.created_at }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        {% if all_orders %}
+            <div class="orders-scroll-area">
+                <div class="orders-stack">
+                    {% for order in all_orders %}
+                        <article class="order-card content-card">
+                            <div class="order-header">
+                                <div>
+                                    <h3>Order #{{ order.id }}</h3>
+                                    <p class="order-meta">
+                                        User: {{ order.user.username }} | Date: {{ order.created_at }} | Status: {{ order.status }}
+                                    </p>
+                                </div>
+                                <p class="order-total">€{{ order.total_amount }}</p>
+                            </div>
+
+                            <div class="table-wrap sticky-table">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order.items.all %}
+                                            <tr>
+                                                <td>{{ item.product.name }}</td>
+                                                <td>{{ item.quantity }}</td>
+                                                <td>€{{ item.price_at_purchase }}</td>
+                                                <td>€{{ item.subtotal }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_order">
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <button type="submit" class="button secondary-button">Delete Order</button>
+                            </form>
+                        </article>
+                    {% endfor %}
+                </div>
             </div>
         {% else %}
             <p>No orders available yet.</p>

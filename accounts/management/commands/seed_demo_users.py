@@ -18,6 +18,7 @@ class Command(BaseCommand):
         self.create_premium_user()
         self.create_manager_user()
         self.create_admin_user()
+        self.remove_old_test_user()
         self.stdout.write(self.style.SUCCESS("Demo users created or updated successfully."))
 
     def create_regular_user(self):
@@ -99,3 +100,7 @@ class Command(BaseCommand):
         profile.save()
 
         Cart.objects.get_or_create(user=user)
+
+    def remove_old_test_user(self):
+        """Delete the old test user if it still exists."""
+        User.objects.filter(username="testuser").delete()

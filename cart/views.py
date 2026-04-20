@@ -10,9 +10,13 @@ from .models import Cart, CartItem, Order, OrderItem
 
 
 def user_has_premium_access(user):
-    # Premium access is granted to admins or users with an active premium subscription.
+    # Premium access is granted to admins, managers, or users with an active premium subscription.
     if user.is_superuser:
         return True
+
+    if getattr(user.profile, "role", "") == "manager":
+        return True
+
     return user.premium_subscriptions.filter(is_active=True).exists()
 
 
@@ -46,7 +50,7 @@ def add_to_cart(request, product_id):
     if product.is_premium_only and not user_has_premium_access(request.user):
         messages.error(
             request,
-            "This item is available only for users with an active premium subscription.",
+            "This item is available only for users with premium access.",
         )
         return redirect("catalog:product-detail", slug=product.slug)
 
@@ -118,7 +122,7 @@ def checkout(request):
     if blocked_items:
         messages.error(
             request,
-            "Your cart contains premium-only items. Activate premium to continue or remove those items.",
+            "Your cart contains premium-only items. You need premium access to continue or remove those items.",
         )
         return redirect("cart:cart-detail")
 

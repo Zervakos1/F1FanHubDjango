@@ -1,6 +1,10 @@
 /* admin_dashboard.css
-   Styles the admin dashboard.
-   Includes summary cards, dashboard intro, action buttons, and responsive admin overview layout.
+   Management dashboard styles with:
+   - summary cards
+   - full product editor cards
+   - scrollable product/order/user sections
+   - sticky table headers
+   - responsive layout
 */
 
 .dashboard-grid {
@@ -47,8 +51,257 @@
     font-weight: 700;
 }
 
+.profile-form,
+.manager-stack {
+    display: grid;
+    gap: 16px;
+}
+
+.field-group {
+    display: grid;
+    gap: 8px;
+}
+
+.field-group label {
+    font-weight: 600;
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+    width: 100%;
+}
+
+.checkbox-field {
+    align-content: end;
+}
+
+.checkbox-field label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+.checkbox-field input[type="checkbox"] {
+    width: auto;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.dashboard-scroll-area {
+    max-height: 760px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.orders-scroll-area {
+    max-height: 900px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.user-table-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.dashboard-scroll-area::-webkit-scrollbar,
+.orders-scroll-area::-webkit-scrollbar,
+.user-table-scroll::-webkit-scrollbar,
+.table-wrap::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.dashboard-scroll-area::-webkit-scrollbar-thumb,
+.orders-scroll-area::-webkit-scrollbar-thumb,
+.user-table-scroll::-webkit-scrollbar-thumb,
+.table-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+}
+
+.dashboard-scroll-area::-webkit-scrollbar-track,
+.orders-scroll-area::-webkit-scrollbar-track,
+.user-table-scroll::-webkit-scrollbar-track,
+.table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.manager-product-card {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.manager-product-card[open] {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.manager-product-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+}
+
+.manager-product-summary::-webkit-details-marker {
+    display: none;
+}
+
+.manager-product-summary::after {
+    content: "+";
+    font-size: 1.2rem;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.manager-product-card[open] .manager-product-summary::after {
+    content: "−";
+}
+
+.manager-product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.manager-image-preview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.checkbox-field label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.checkbox-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+}
+
+.checkbox-field span {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.checkbox-field input[type="checkbox"]:checked + span {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: var(--role-accent);
+    color: #ffffff;
+}
+
+.inline-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.delete-form {
+    margin-top: 12px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+}
+
+.sticky-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: rgba(17, 24, 39, 0.95);
+}
+
+.orders-stack {
+    display: grid;
+    gap: 16px;
+}
+
+.order-card {
+    display: grid;
+    gap: 16px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.order-header h3 {
+    margin: 0 0 6px;
+}
+
+.order-meta {
+    margin: 0;
+    color: var(--text-soft);
+}
+
+.order-total {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.small-top-space {
+    margin-top: 8px;
+}
+
+@media (max-width: 1200px) {
+    .manager-product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 900px) {
     .summary-grid {
         grid-template-columns: 1fr;
+    }
+
+    .manager-product-summary {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 700px) {
+    .manager-product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-scroll-area,
+    .orders-scroll-area,
+    .user-table-scroll {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
     }
 }
